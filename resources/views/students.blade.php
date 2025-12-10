@@ -18,24 +18,22 @@
                             <div class="card-body">
                                 <!-- <h5 class="card-title">Light Heading</h5> -->
 
-                                <table class="table">
+                                <table class="data-table data-table-feature">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Student ID</th>
-                                            <th scope="col">Start</th>
-                                            <th scope="col">End</th>
-                                            <th scope="col">Type</th>
-                                            <th scope="col">Module</th>
-                                            <th scope="col">Batch</th>
-                                            <th scope="col">Status</th>
+                                            <th>Student ID</th>
+                                            <th>Date & Time</th>
+                                            <th>Type</th>
+                                            <th>Module</th>
+                                            <th>Batch</th>
+                                            <th>Stat</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($students as $student)
                                             <tr>
                                                 <td>{{ explode(' ', $student->title)[0] }}</td>
-                                                <td>{{ $student->start }}</td>
-                                                <td>{{ $student->end }}</td>
+                                                <td>{{ $student->start }} - {{ $student->end }}</td>
                                                 <td>{{ $student->description }}</td>
                                                 <td>{{ $student->module }}</td>
                                                 <td>{{ $student->batch }}</td>

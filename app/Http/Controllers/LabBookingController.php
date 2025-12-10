@@ -51,6 +51,21 @@ class LabBookingController extends Controller
         return view('calendar', compact('batches', 'courses', 'labs', 'computers'));
     }
 
+    public function batches(){
+        $batches = Batch::join('courses', 'batches.course_id', '=', 'courses.id')
+            ->select('batches.*', 'courses.course_code as course_code')
+            ->get();
+        $courses = Course::all();
+        $students = LabBooking::where('description', 'Exam')
+            ->orWhere('description', 'Practical')
+            ->get();
+        $labs = Lab::all();
+        $statuses = Batch::select('status')->distinct()->get();
+        $computers = Computer::where('status', 'active')
+            ->get(['id', 'computer_label', 'lab_id']);
+        return view('batches', compact('batches', 'courses', 'labs', 'computers','students', 'statuses'));
+    }
+
     public function students(){
         $students = LabBooking::where('description', 'Exam')
             ->orWhere('description', 'Practical')
@@ -63,8 +78,7 @@ class LabBookingController extends Controller
         return view('students', compact('batches', 'courses', 'labs', 'computers','students'));
     }
 
-    public function getBatches($course_id)
-    {
+    public function getBatches($course_id){
         $batches = Batch::where('course_id', $course_id)
                         ->orderBy('batch_number', 'asc')
                         ->get(['id', 'batch_number']);
@@ -72,8 +86,7 @@ class LabBookingController extends Controller
         return response()->json($batches);
     }
 
-    public function eventStore(Request $request)
-    {
+    public function eventStore(Request $request){
         // dd($request->all());
         $request->validate([
             'date' => 'required|date',
@@ -163,8 +176,7 @@ class LabBookingController extends Controller
         return redirect()->back()->with('success', 'Event created successfully!');
     }
 
-    public function individualEventStore(Request $request)
-    {
+    public function individualEventStore(Request $request){
         // dd($request->all());
         $request->validate([
             'date' => 'required|date',
@@ -307,11 +319,10 @@ class LabBookingController extends Controller
             // Add other fields as necessary
         ]);
 
-        return redirect()->back()->with('success', 'Event created successfully!');
+        return redirect()->back()->with('success', 'Reservation created successfully!');
     }
 
-    public function bookingComplete(Request $request)
-    {
+    public function bookingComplete(Request $request){
         $Booking = LabBooking::find($request->booking_id);
 
         if (!$Booking) {
@@ -325,8 +336,7 @@ class LabBookingController extends Controller
         return redirect()->back()->with('success', 'Event marked as Completed!');
     }
 
-    public function bookingCancel(Request $request)
-    {
+    public function bookingCancel(Request $request){
         $Booking = LabBooking::find($request->booking_id);
 
         if (!$Booking) {
@@ -340,8 +350,7 @@ class LabBookingController extends Controller
         return redirect()->back()->with('success', 'Event marked as Cancelled!');
     }
 
-    public function bookingDelete(Request $request)
-    {
+    public function bookingDelete(Request $request){
         $Booking = LabBooking::find($request->booking_id);
 
         if (!$Booking) {
@@ -355,8 +364,7 @@ class LabBookingController extends Controller
         return redirect()->back()->with('success', 'Event marked as Deleted!');
     }
 
-    public function getEvents()
-    {
+    public function getEvents(){
         $events = LabBooking::with(['lab', 'computer'])->get()->map(function ($booking) {
             return [
                 'id'    => $booking->id,
@@ -383,8 +391,7 @@ class LabBookingController extends Controller
         return response()->json($events);
     }
 
-    public function getModules($course_id)
-    {
+    public function getModules($course_id){
         $modules = Module::where('course_id', $course_id)
                         ->orderBy('module_number', 'asc')
                         ->get(['id', 'module_number', 'name']);
@@ -392,8 +399,7 @@ class LabBookingController extends Controller
         return response()->json($modules);
     }
 
-    public function getModuleDuration($id)
-    {
+    public function getModuleDuration($id){
         $module = Module::findOrFail($id);
 
         return response()->json([
@@ -401,16 +407,14 @@ class LabBookingController extends Controller
         ]);
     }
 
-    public function getActiveComputers()
-    {
+    public function getActiveComputers(){
         $computers = Computer::where('status', 'active')
             ->get(['id', 'computer_label', 'lab_id']);
 
         return response()->json($computers);
     }
 
-    public function getComputerDetails($id)
-    {
+    public function getComputerDetails($id){
         $computer = Computer::with('software')->findOrFail($id);
 
         // Build response array

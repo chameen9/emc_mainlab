@@ -144,6 +144,11 @@
                                 <i class="simple-icon-graduation"></i> Students
                             </a>
                         </li>
+                        <li class="{{ trim($__env->yieldContent('nav')) === 'batches' ? 'active' : '' }}">
+                            <a href="{{route('batches')}}">
+                                <i class="simple-icon-notebook"></i> Batches
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

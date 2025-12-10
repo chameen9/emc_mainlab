@@ -17,6 +17,7 @@ Route::get('/student-booking','App\Http\Controllers\LabBookingController@student
 Route::get('/computers','App\Http\Controllers\LabBookingController@getComputers')->name('getComputers');
 Route::get('/calendar','App\Http\Controllers\LabBookingController@calendar')->name('calendar');
 Route::get('/students','App\Http\Controllers\LabBookingController@students')->name('students');
+Route::get('/batches','App\Http\Controllers\LabBookingController@batches')->name('batches');
 Route::post('/event-store', 'App\Http\Controllers\LabBookingController@eventStore')->name('eventStore');
 Route::post('/individual-event-store', 'App\Http\Controllers\LabBookingController@individualEventStore')->name('individualEventStore');
 Route::post('/booking-complete', 'App\Http\Controllers\LabBookingController@bookingComplete')->name('bookingComplete');

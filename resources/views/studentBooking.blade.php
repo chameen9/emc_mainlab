@@ -25,7 +25,8 @@
                         <div class="position-relative image-side ">
                             <p class=" text-white h2">Welcome to EMC Galle</p>
                             <p class="white mb-0">
-                                Please use this form to make a reservation.
+                                Please use this form to make a reservation. <br>
+                                Call us if you need help. <a class="white" href="tel:+94912231253">+94 91 223 1253</a>
                             </p>
                         </div>
                         <div class="form-side">
