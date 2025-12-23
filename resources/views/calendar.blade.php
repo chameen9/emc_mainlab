@@ -171,8 +171,8 @@
                                 
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-dismiss="modal">Close</button>
+                                <!-- <button type="button" class="btn btn-secondary"
+                                    data-dismiss="modal">Close</button> -->
                                     <form action="{{route('bookingComplete')}}" method="post">
                                         @csrf
                                         <input type="hidden" name="booking_id" id="modalBookingID">
@@ -442,8 +442,9 @@
                                             <div class="form-group">
                                                 <label for="invigilator">Invigilator *</label>
                                                 <select name="invigilator" class="form-control select2-single" id="invigilator" data-width="100%" required>
-                                                    <option value="Ms. Lankeshi">Ms. Lankeshi</option>
-                                                    <option value="Ms. Samadhi">Ms. Samadhi</option>
+                                                    @foreach($invigilators as $invigilator)
+                                                        <option value="{{ $invigilator->name }}">{{ $invigilator->name }}</option>
+                                                    @endforeach
                                                     <option value="Other">Other</option>
                                                 </select>
                                             </div>

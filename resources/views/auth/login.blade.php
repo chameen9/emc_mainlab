@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dore jQuery</title>
+    <title>Login - EMC Main Lab</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <link rel="stylesheet" href="font/iconsmind-s/css/iconsminds.css" />
@@ -24,12 +24,11 @@
                     <div class="card auth-card">
                         <div class="position-relative image-side ">
 
-                            <p class=" text-white h2">MAGIC IS IN THE DETAILS</p>
+                            <p class=" text-white h2">ESOFT Metro Campus</p>
 
                             <p class="white mb-0">
-                                Please use your credentials to login.
-                                <br>If you are not a member, please
-                                <a href="#" class="white">register</a>.
+                                Please use your credentials to login. <br><br>
+                                {!! Illuminate\Foundation\Inspiring::quote() !!}
                             </p>
                         </div>
                         <div class="form-side">
@@ -37,18 +36,23 @@
                                 <span class="logo-single"></span>
                             </a>
                             <h6 class="mb-4">Login</h6>
-                            <form>
+                            <form method="POST" action="/login">
+                                @csrf
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" />
+                                    <input class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email') }}"/>
                                     <span>E-mail</span>
                                 </label>
-
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" type="password" placeholder="" />
+                                    <input class="form-control @error('password') is-invalid @enderror" type="password" name="password" placeholder="" />
                                     <span>Password</span>
+                                    
                                 </label>
+                               @error('email')
+                                    <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                                
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <a href="#">Forget password?</a>
+                                    <a href="{{ route('studentBooking') }}"><span class="iconsminds-right-1"></span>Student Booking</a>
                                     <button class="btn btn-primary btn-lg btn-shadow" type="submit">LOGIN</button>
                                 </div>
                             </form>

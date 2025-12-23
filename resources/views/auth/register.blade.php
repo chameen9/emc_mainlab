@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dore jQuery</title>
+    <title>Register - EMC Main Lab</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <link rel="stylesheet" href="font/iconsmind-s/css/iconsminds.css" />
@@ -23,11 +23,11 @@
                 <div class="col-12 col-md-10 mx-auto my-auto">
                     <div class="card auth-card">
                         <div class="position-relative image-side ">
-                            <p class=" text-white h2">MAGIC IS IN THE DETAILS</p>
+                            <p class=" text-white h2">ESOFT Metro Campus</p>
                             <p class="white mb-0">
                                 Please use this form to register.
                                 <br>If you are a member, please
-                                <a href="#" class="white">login</a>.
+                                <a href="{{ route('login') }}" class="white">login</a>.
                             </p>
                         </div>
                         <div class="form-side">
@@ -36,18 +36,23 @@
                             </a>
                             <h6 class="mb-4">Register</h6>
 
-                            <form>
+                            <form method="POST" action="/register">
+                                @csrf
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" />
+                                    <input class="form-control" name="name" />
                                     <span>Name</span>
                                 </label>
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" />
+                                    <input class="form-control" name="email" />
                                     <span>E-mail</span>
                                 </label>
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" type="password" placeholder="" />
+                                    <input class="form-control" type="password" name="password" placeholder="" />
                                     <span>Password</span>
+                                </label>
+                                <label class="form-group has-float-label mb-4">
+                                    <input class="form-control" type="password" name="password_confirmation" placeholder="" />
+                                    <span>Password Confirmation</span>
                                 </label>
                                 <div class="d-flex justify-content-end align-items-center">
                                     <button class="btn btn-primary btn-lg btn-shadow" type="submit">REGISTER</button>
