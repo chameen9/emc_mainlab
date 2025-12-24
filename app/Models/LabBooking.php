@@ -22,7 +22,8 @@ class LabBooking extends Model
         'color',
         'created_by',
         'status',
-        'notes'
+        'notes',
+        'is_all_day'
     ];
 
     public function lab()

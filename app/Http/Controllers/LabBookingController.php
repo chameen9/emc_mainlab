@@ -85,6 +85,66 @@ class LabBookingController extends Controller
         return view('users', compact('users'));
     }
 
+    public function holidays(){
+        $holidays = LabBooking::where('is_all_day', 1)->where('description','Holiday')->get();
+        // dd($holidays);
+        return view('holidays', compact('holidays'));
+    }
+
+    public function addHoliday(Request $request){
+        $request->validate([
+            'date' => 'required|date',
+            'description' => 'required|string|max:255',
+        ]);
+
+        $date = Carbon::createFromFormat('Y-m-d', $request->input('date'))->format('Y-m-d');
+
+        // Create holiday for all labs
+        $labs = Lab::all();
+        foreach ($labs as $lab) {
+            LabBooking::create([
+                'title' => $request->input('description'),
+                'start' => $date . ' 00:00:00',
+                'end' => $date . ' 23:59:59',
+                'lab_id' => $lab->id,
+                'batch' => null,
+                'description' => 'Holiday',
+                'lecturer' => null,
+                'module' => null,
+                'color' => '#eeff00ff',
+                'created_by' => auth()->user()->name,
+                'students_count' => 0,
+                'notes' => $request->input('description'),
+                'is_all_day' => 1,
+                'status' => 'Scheduled',
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Holiday added successfully!');
+    }
+
+    public function deleteHoliday(Request $request){
+        $holidayDateRange = $request->input('holiday_date');
+        list($startDate, $endDate) = explode(' - ', $holidayDateRange);
+
+        $Holidays = LabBooking::where('start', '>=', $startDate)
+            ->where('end', '<=', $endDate)
+            ->where('description', 'Holiday')
+            ->where('is_all_day', 1)
+            ->get();
+
+        if ($Holidays->isEmpty()) {
+            return redirect()->back()->with('error', 'Holiday not found!');
+        }
+        else{
+            foreach ($Holidays as $holiday) {$Holidays->each->delete();
+                $holiday->delete();
+            }
+
+            return redirect()->back()->with('success', 'Holiday deleted successfully!');
+        }
+    }
+
     public function getBatches($course_id){
         $batches = Batch::where('course_id', $course_id)
                         ->orderBy('batch_number', 'asc')
@@ -132,12 +192,16 @@ class LabBookingController extends Controller
         $conflictBatch = LabBooking::where('lab_id', $mainLab)
             ->where('status', 'Scheduled')   // ✅ Only active bookings
             ->whereDate('start', $date)
-            ->whereIn('description', ['Batch Exam', 'Batch Practical'])    // Only block exams + practicals
+            ->whereIn('description', ['Batch Exam', 'Batch Practical','Holiday'])    // Only block exams + practicals and Holidays
             ->where(function ($query) use ($start, $end) {
                 $query->where('start', '<', $end)
                     ->where('end', '>', $start);            // Overlap detection
             })
             ->first();
+
+        if ($conflictBatch->description == 'Holiday') {
+            return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
+        }
 
         if ($conflictBatch) {
             return redirect()->back()->with('error',
@@ -221,12 +285,16 @@ class LabBookingController extends Controller
         $conflictBatch = LabBooking::where('lab_id', $mainLab)
             ->where('status', 'Scheduled')   // ✅ Only active bookings
             ->whereDate('start', $date)
-            ->whereIn('description', ['Batch Exam', 'Batch Practical'])    // Only block exams + practicals
+            ->whereIn('description', ['Batch Exam', 'Batch Practical','Holiday'])    // Only block exams + practicals and Holidays
             ->where(function ($query) use ($start, $end) {
                 $query->where('start', '<', $end)
                     ->where('end', '>', $start);            // Overlap detection
             })
             ->first();
+        
+        if ($conflictBatch->description == 'Holiday') {
+            return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
+        }
 
         if ($conflictBatch) {
             return redirect()->back()->with('error',
@@ -367,12 +435,16 @@ class LabBookingController extends Controller
         $conflictBatch = LabBooking::where('lab_id', $mainLab)
             ->where('status', 'Scheduled')   // ✅ Only active bookings
             ->whereDate('start', $date)
-            ->whereIn('description', ['Batch Exam', 'Batch Practical'])    // Only block exams + practicals
+            ->whereIn('description', ['Batch Exam', 'Batch Practical','Holiday'])    // Only block exams + practicals
             ->where(function ($query) use ($start, $end) {
                 $query->where('start', '<', $end)
                     ->where('end', '>', $start);            // Overlap detection
             })
             ->first();
+
+        if ($conflictBatch->description == 'Holiday') {
+            return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
+        }
 
         if ($conflictBatch) {
             return redirect()->back()->with('error',
@@ -482,6 +554,10 @@ class LabBookingController extends Controller
             return redirect()->back()->with('error', 'Booking not found!');
         }
 
+        if($Booking->description == 'Holiday'){
+            return redirect()->back()->with('error', 'Holidays cannot be completed. Please contact admin.');
+        }
+
         $Booking->status = 'Completed';
         $Booking->color = '#28A745';
         $Booking->save();
@@ -496,6 +572,10 @@ class LabBookingController extends Controller
             return redirect()->back()->with('error', 'Booking not found!');
         }
 
+        if($Booking->description == 'Holiday'){
+            return redirect()->back()->with('error', 'Holidays cannot be cancelled. Please contact admin.');
+        }
+
         $Booking->status = 'Cancelled';
         $Booking->color = '#E0A800';
         $Booking->save();
@@ -508,6 +588,10 @@ class LabBookingController extends Controller
 
         if (!$Booking) {
             return redirect()->back()->with('error', 'Booking not found!');
+        }
+
+        if($Booking->description == 'Holiday'){
+            return redirect()->back()->with('error', 'Holidays cannot be deleted. Please contact admin.');
         }
 
         $Booking->status = 'Deleted';

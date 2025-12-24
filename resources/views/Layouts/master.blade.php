@@ -160,6 +160,11 @@
                                 <i class="simple-icon-user"></i> Users
                             </a>
                         </li>
+                        <li class="{{ trim($__env->yieldContent('nav')) === 'holidays' ? 'active' : '' }}">
+                            <a href="{{route('holidays')}}">
+                                <i class="simple-icon-event"></i> Holidays
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
