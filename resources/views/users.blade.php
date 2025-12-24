@@ -100,6 +100,12 @@
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-12">
+                                <p>User will be notified their account has been created with the Password.</p>
+                            </div>
+                        </div>
+
 
                     </div>
                     
