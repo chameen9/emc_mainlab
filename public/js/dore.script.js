@@ -1066,70 +1066,80 @@ $.dore = function (element, options) {
         });
       }
 
-      if (document.getElementById("visitChart")) {
-        var visitChart = document.getElementById("visitChart").getContext("2d");
-        var myChart = new Chart(visitChart, {
-          type: "LineWithShadow",
-          options: {
-            plugins: {
-              datalabels: {
-                display: false
-              }
-            },
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              yAxes: [
-                {
-                  gridLines: {
-                    display: true,
-                    lineWidth: 1,
-                    color: "rgba(0,0,0,0.1)",
-                    drawBorder: false
-                  },
-                  ticks: {
-                    beginAtZero: true,
-                    stepSize: 5,
-                    min: 50,
-                    max: 70,
-                    padding: 0
-                  }
-                }
-              ],
-              xAxes: [
-                {
-                  gridLines: {
-                    display: false
-                  }
-                }
-              ]
-            },
-            legend: {
+      if (document.getElementById("studentUsageChart")) {
+        var visitChart = document.getElementById("studentUsageChart").getContext("2d");
+        
+        function fetchChartData(url) {
+          $.ajax({
+        url: url,
+        type: 'GET',
+        success: function(response) {
+          var myChart = new Chart(visitChart, {
+            type: "LineWithShadow",
+            options: {
+          plugins: {
+            datalabels: {
               display: false
-            },
-            tooltips: chartTooltip
+            }
           },
-          data: {
-            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            yAxes: [
               {
-                label: "",
-                data: [54, 63, 60, 65, 60, 68, 60],
-                borderColor: themeColor1,
-                pointBackgroundColor: foregroundColor,
-                pointBorderColor: themeColor1,
-                pointHoverBackgroundColor: themeColor1,
-                pointHoverBorderColor: foregroundColor,
-                pointRadius: 4,
-                pointBorderWidth: 2,
-                pointHoverRadius: 5,
-                fill: true,
-                borderWidth: 2,
-                backgroundColor: themeColor1_10
+            gridLines: {
+              display: true,
+              lineWidth: 1,
+              color: "rgba(0,0,0,0.1)",
+              drawBorder: false
+            },
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1,
+              min: 0,
+              max: response.max_value,
+              padding: 0
+            }
+              }
+            ],
+            xAxes: [
+              {
+            gridLines: {
+              display: false
+            }
               }
             ]
-          }
-        });
+          },
+          legend: {
+            display: false
+          },
+          tooltips: chartTooltip
+            },
+            data: {
+          labels: response.labels,
+          datasets: [
+            {
+              label: "",
+              data: response.data,
+              borderColor: themeColor1,
+              pointBackgroundColor: foregroundColor,
+              pointBorderColor: themeColor1,
+              pointHoverBackgroundColor: themeColor1,
+              pointHoverBorderColor: foregroundColor,
+              pointRadius: 4,
+              pointBorderWidth: 2,
+              pointHoverRadius: 5,
+              fill: true,
+              borderWidth: 2,
+              backgroundColor: themeColor2_10
+            }
+          ]
+            }
+          });
+        }
+          });
+        }
+        fetchChartData('/lab-usage-chart-student-monthly');
       }
 
       if (document.getElementById("conversionChart")) {
@@ -1262,38 +1272,38 @@ $.dore = function (element, options) {
         }
       };
 
-      if (document.getElementById("smallChart1")) {
-        var smallChart1 = document
-          .getElementById("smallChart1")
-          .getContext("2d");
-        var myChart = new Chart(smallChart1, {
-          type: "LineWithLine",
-          plugins: [smallChartInit],
-          data: {
-            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-              {
-                label: "Total Orders",
-                borderColor: themeColor1,
-                pointBorderColor: themeColor1,
-                pointHoverBackgroundColor: themeColor1,
-                pointHoverBorderColor: themeColor1,
-                pointRadius: 2,
-                pointBorderWidth: 3,
-                pointHoverRadius: 2,
-                fill: false,
-                borderWidth: 2,
-                data: [1250, 1300, 1550, 921, 1810, 1106, 1610],
-                datalabels: {
-                  align: "end",
-                  anchor: "end"
-                }
-              }
-            ]
-          },
-          options: smallChartOptions
-        });
-      }
+      // if (document.getElementById("smallChart1")) {
+      //   var smallChart1 = document
+      //     .getElementById("smallChart1")
+      //     .getContext("2d");
+      //   var myChart = new Chart(smallChart1, {
+      //     type: "LineWithLine",
+      //     plugins: [smallChartInit],
+      //     data: {
+      //       labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      //       datasets: [
+      //         {
+      //           label: "Total Orders",
+      //           borderColor: themeColor1,
+      //           pointBorderColor: themeColor1,
+      //           pointHoverBackgroundColor: themeColor1,
+      //           pointHoverBorderColor: themeColor1,
+      //           pointRadius: 2,
+      //           pointBorderWidth: 3,
+      //           pointHoverRadius: 2,
+      //           fill: false,
+      //           borderWidth: 2,
+      //           data: [1250, 1300, 1550, 921, 1810, 1106, 1610],
+      //           datalabels: {
+      //             align: "end",
+      //             anchor: "end"
+      //           }
+      //         }
+      //       ]
+      //     },
+      //     options: smallChartOptions
+      //   });
+      // }
 
       if (document.getElementById("smallChart2")) {
         var smallChart2 = document
@@ -2343,57 +2353,70 @@ $.dore = function (element, options) {
         }
       };
 
-      if (document.getElementById("categoryChart")) {
-        var categoryChart = document.getElementById("categoryChart");
-        var myDoughnutChart = new Chart(categoryChart, {
-          plugins: [centerTextPlugin],
-          type: "DoughnutWithShadow",
-          data: {
-            labels: ["Cakes", "Cupcakes", "Desserts"],
-            datasets: [
-              {
-                label: "",
-                borderColor: [themeColor3, themeColor2, themeColor1],
-                backgroundColor: [
-                  themeColor3_10,
-                  themeColor2_10,
-                  themeColor1_10
-                ],
-                borderWidth: 2,
-                data: [15, 25, 20]
+      if (document.getElementById("comparisonChart")) {
+
+      var comparisonChart = document.getElementById("comparisonChart");
+      var myDoughnutChart = null;
+
+      $.ajax({
+          url: '/comparison-chart',
+          type: 'GET',
+          success: function (response) {
+
+              if (myDoughnutChart) {
+                  myDoughnutChart.destroy();
               }
-            ]
-          },
-          draw: function () { },
-          options: {
-            plugins: {
-              datalabels: {
-                display: false
-              }
-            },
-            responsive: true,
-            maintainAspectRatio: false,
-            cutoutPercentage: 80,
-            title: {
-              display: false
-            },
-            layout: {
-              padding: {
-                bottom: 20
-              }
-            },
-            legend: {
-              position: "bottom",
-              labels: {
-                padding: 30,
-                usePointStyle: true,
-                fontSize: 12
-              }
-            },
-            tooltips: chartTooltip
+
+              myDoughnutChart = new Chart(comparisonChart, {
+                  plugins: [centerTextPlugin],
+                  type: "DoughnutWithShadow",
+                  data: {
+                      labels: ["Scheduled", "Completed", "Cancelled", "Deleted"],
+                      datasets: [{
+                          data: [
+                              response.Scheduled,
+                              response.Completed,
+                              response.Cancelled,
+                              response.Deleted
+                          ],
+                          borderColor: [
+                              themeColor1,
+                              themeColor2,
+                              themeColor3,
+                              themeColor4
+                          ],
+                          backgroundColor: [
+                              themeColor1_10,
+                              themeColor2_10,
+                              themeColor3_10,
+                              themeColor4_10
+                          ],
+                          borderWidth: 2
+                      }]
+                  },
+                  options: {
+                      plugins: {
+                          datalabels: {
+                              display: false
+                          }
+                      },
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      cutoutPercentage: 80,
+                      legend: {
+                          position: "bottom",
+                          labels: {
+                              padding: 30,
+                              usePointStyle: true,
+                              fontSize: 12
+                          }
+                      },
+                      tooltips: chartTooltip
+                  }
+              });
           }
-        });
-      }
+      });
+  }
 
       if (document.getElementById("categoryChartNoShadow")) {
         var categoryChartNoShadow = document.getElementById(

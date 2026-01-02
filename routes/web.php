@@ -16,7 +16,7 @@ Route::post('/externalindividual-event-store', 'App\Http\Controllers\LabBookingC
 Route::middleware(['auth', 'role:invigilator,admin'])->group(function () {
 
     // Navigations
-    Route::get('/', function () {return view('index');})->name('index');
+    Route::get('/', 'App\Http\Controllers\LabBookingController@index')->name('index');
     Route::get('/computers', 'App\Http\Controllers\LabBookingController@getComputers')->name('getComputers');
     Route::get('/calendar', 'App\Http\Controllers\LabBookingController@calendar')->name('calendar');
     Route::get('/students', 'App\Http\Controllers\LabBookingController@students')->name('students');
@@ -56,3 +56,9 @@ Route::get('/get-modules/{course_id}', 'App\Http\Controllers\LabBookingControlle
 Route::get('/module-duration/{id}', 'App\Http\Controllers\LabBookingController@getModuleDuration')->name('getModuleDuration');
 Route::get('/get-computers', 'App\Http\Controllers\LabBookingController@getActiveComputers')->name('getActiveComputers');
 Route::get('/get-computer-details/{id}', 'App\Http\Controllers\LabBookingController@getComputerDetails')->name('getComputerDetails');
+Route::get('/lab-usage-chart-student-weekly', 'App\Http\Controllers\ChartController@weeklyStudentBookingsChart')->name('weeklyStudentBookingsChart');
+Route::get('/lab-usage-chart-student-monthly', 'App\Http\Controllers\ChartController@monthlyStudentBookingsChart')->name('monthlyStudentBookingsChart');
+
+Route::get('/lab-usage-chart-batch-weekly', 'App\Http\Controllers\ChartController@weeklyBatchBookingsChart')->name('weeklyBatchBookingsChart');
+Route::get('/lab-usage-chart-batch-monthly', 'App\Http\Controllers\ChartController@monthlyBatchBookingsChart')->name('monthlyBatchBookingsChart');
+Route::get('/comparison-chart', 'App\Http\Controllers\ChartController@comparisonChart')->name('comparisonChart');

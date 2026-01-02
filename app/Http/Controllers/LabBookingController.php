@@ -15,6 +15,203 @@ use Carbon\Carbon;
 
 class LabBookingController extends Controller
 {
+    public function index(){
+        $currentMonth = Carbon::now()->format('F');
+
+        $startDate = Carbon::now()->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
+        
+        // Individual Exams
+        $scheduledExamCount = LabBooking::where('description', 'Exam')
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+
+        $completedExamCount = LabBooking::where('description', 'Exam')
+            ->where('status', 'Completed')
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+
+        $completedExamPercentage = $scheduledExamCount > 0
+            ? round(($completedExamCount / $scheduledExamCount) * 100, 2)
+            : 0;
+
+        // Individual Practicals
+        $scheduledPracticalCount = LabBooking::where('description', 'Practical')
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+
+        $completedPracticalCount = LabBooking::where('description', 'Practical')
+            ->where('status', 'Completed')
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+
+        $completedPracticalPercentage = $scheduledPracticalCount > 0
+            ? round(($completedPracticalCount / $scheduledPracticalCount) * 100, 2)
+            : 0;
+
+        // Batch Exams
+        $scheduledBatchExamCount = LabBooking::where('description', 'Batch Exam')
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+
+        $completedBatchExamCount = LabBooking::where('description', 'Batch Exam')
+            ->where('status', 'Completed')
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+
+        $completedBatchExamPercentage = $scheduledBatchExamCount > 0
+            ? round(($completedBatchExamCount / $scheduledBatchExamCount) * 100, 2)
+            : 0;
+
+        // Batch Practicals
+        $scheduledBatchPracticalCount = LabBooking::where('description', 'Batch Practical')
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+        $completedBatchPracticalCount = LabBooking::where('description', 'Batch Practical')
+            ->where('status', 'Completed')
+            ->whereBetween('start', [$startDate, $endDate])
+            ->count();
+        $completedBatchPracticalPercentage = $scheduledBatchPracticalCount > 0
+            ? round(($completedBatchPracticalCount / $scheduledBatchPracticalCount) * 100, 2)
+            : 0;
+
+        //Card Counts
+        $thisWeekStartDate = Carbon::now()->startOfWeek()->format('m/d');
+        $thisWeekEndDate = Carbon::now()->endOfWeek()->format('m/d');
+
+        $thisMonthStartDate = Carbon::now()->startOfMonth()->format('m/d');
+        $thisMonthEndDate = Carbon::now()->endOfMonth()->format('m/d');
+
+        $thisWeekExamPracticalCount = LabBooking::where(function ($q) {
+                $q->where('description', 'Exam')
+                ->orWhere('description', 'Practical');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->count();
+
+        $thisWeekBatchExamPracticalCount = LabBooking::where(function ($q) {
+                $q->where('description', 'Batch Exam')
+                ->orWhere('description', 'Batch Practical');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->count();
+
+        $thisMonthExamPracticalCount = LabBooking::where(function ($q) {
+                $q->where('description', 'Exam')
+                ->orWhere('description', 'Practical');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+            ->count();
+
+        $thisMonthBatchExamPracticalCount = LabBooking::where(function ($q) {
+                $q->where('description', 'Batch Exam')
+                ->orWhere('description', 'Batch Practical');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+            ->count();
+
+        //Small Card Data
+        $TrendingBatch = LabBooking::select('batch')
+            ->where(function ($q) {
+                $q->where('description', 'Batch Exam')
+                ->orWhere('description', 'Batch Practical')
+                ->orWhere('description', 'Exam')
+                ->orWhere('description', 'Practical');
+            })
+            ->where(function ($q) {
+                $q->where('status', 'Scheduled')
+                ->orWhere('status', 'Completed');
+            })
+            ->whereBetween('start', [Carbon::now()->subDays(30), Carbon::now()])
+            ->groupBy('batch')
+            ->orderByRaw('COUNT(*) DESC')
+            ->first();
+
+        $TrendingStudent = LabBooking::selectRaw("
+                SUBSTRING_INDEX(title, ' ', 1) as student_id,
+                COUNT(*) as booking_count
+            ")
+            ->whereIn('description', ['Exam', 'Practical'])
+            ->whereIn('status', ['Scheduled', 'Completed'])
+            ->whereBetween('start', [Carbon::now()->subDays(30), Carbon::now()])
+            ->groupBy('student_id')
+            ->orderByDesc('booking_count')
+            ->first();
+
+        $busiestDay = LabBooking::selectRaw('DATE(start) as booking_date, COUNT(*) as booking_count')
+            ->whereBetween('start', [
+                Carbon::now()->subMonth()->startOfMonth(),
+                Carbon::now()->subMonth()->endOfMonth()
+            ])
+            ->whereIn('description', ['Exam', 'Practical'])
+            ->whereIn('status', ['Scheduled', 'Completed'])
+            ->groupBy('booking_date')
+            ->orderByDesc('booking_count')
+            ->first();
+
+        $lastMonth = Carbon::now()->subMonth()->format('F');
+
+        return view('index', compact(
+                'currentMonth',
+                'scheduledExamCount',
+                'completedExamCount',
+                'completedExamPercentage',
+                'scheduledPracticalCount',
+                'completedPracticalCount',
+                'completedPracticalPercentage',
+                'scheduledBatchExamCount',
+                'completedBatchExamCount',
+                'completedBatchExamPercentage',
+                'scheduledBatchPracticalCount',
+                'completedBatchPracticalCount',
+                'completedBatchPracticalPercentage',
+                'thisWeekExamPracticalCount',
+                'thisWeekStartDate',
+                'thisWeekEndDate',
+                'thisWeekBatchExamPracticalCount',
+                'thisMonthStartDate',
+                'thisMonthEndDate',
+                'thisMonthExamPracticalCount',
+                'thisMonthBatchExamPracticalCount',
+                'TrendingBatch',
+                'TrendingStudent',
+                'busiestDay',
+                'lastMonth'
+              ));
+    }
+
     public function getSchedules(){
         return response()->json([
             [
