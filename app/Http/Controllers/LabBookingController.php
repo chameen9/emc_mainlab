@@ -199,11 +199,11 @@ class LabBookingController extends Controller
             })
             ->first();
 
-        if ($conflictBatch->description == 'Holiday') {
-            return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
-        }
-
         if ($conflictBatch) {
+            if ($conflictBatch->description == 'Holiday') {
+                return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
+            }
+
             return redirect()->back()->with('error',
                 'Cannot reserve Main Lab. A ' . $conflictBatch->description .
                 ' for batch ' . $conflictBatch->batch .
@@ -291,12 +291,12 @@ class LabBookingController extends Controller
                     ->where('end', '>', $start);            // Overlap detection
             })
             ->first();
-        
-        if ($conflictBatch->description == 'Holiday') {
-            return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
-        }
 
         if ($conflictBatch) {
+            if ($conflictBatch->description == 'Holiday') {
+                return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
+            }
+
             return redirect()->back()->with('error',
                 'Cannot reserve Main Lab. A ' . $conflictBatch->description .
                 ' for batch ' . $conflictBatch->batch .
@@ -442,15 +442,14 @@ class LabBookingController extends Controller
             })
             ->first();
 
-        if ($conflictBatch->description == 'Holiday') {
-            return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
-        }
-
         if ($conflictBatch) {
+            if ($conflictBatch->description == 'Holiday') {
+                return redirect()->back()->with('error','Cannot reserve any lab due to a Holiday!');
+            }
+
             return redirect()->back()->with('error',
-                'Cannot reserve Main Lab. A ' . $conflictBatch->description .
-                ' for batch ' . $conflictBatch->batch .
-                ' is already scheduled during this time.');
+                'Cannot reserve the Main Lab. A ' . $conflictBatch->description .
+                ' for a batch is already scheduled during this time. Try again with a different time slot.');
         }
 
         if ($request->input('description') == 'Exam') {

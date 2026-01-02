@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/vendor/bootstrap.rtl.only.min.css" />
     <link rel="stylesheet" href="css/vendor/bootstrap-float-label.min.css" />
     <link rel="stylesheet" href="css/main.css" />
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 </head>
 
 <body class="background show-spinner no-footer">

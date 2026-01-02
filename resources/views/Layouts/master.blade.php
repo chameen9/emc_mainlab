@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="css/vendor/bootstrap-datepicker3.min.css" />
         <link rel="stylesheet" href="css/vendor/component-custom-switch.min.css" />
         <link rel="stylesheet" href="css/main.css" />
+        <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
