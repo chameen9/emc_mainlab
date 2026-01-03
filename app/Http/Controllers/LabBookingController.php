@@ -12,6 +12,7 @@ use App\Models\Batch;
 use App\Models\Module;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class LabBookingController extends Controller
 {
@@ -250,21 +251,6 @@ class LabBookingController extends Controller
         return view('calendar', compact('batches', 'courses', 'labs', 'computers', 'invigilators'));
     }
 
-    public function batches(){
-        $batches = Batch::join('courses', 'batches.course_id', '=', 'courses.id')
-            ->select('batches.*', 'courses.course_code as course_code')
-            ->get();
-        $courses = Course::all();
-        $students = LabBooking::where('description', 'Exam')
-            ->orWhere('description', 'Practical')
-            ->get();
-        $labs = Lab::all();
-        $statuses = Batch::select('status')->distinct()->get();
-        $computers = Computer::where('status', 'active')
-            ->get(['id', 'computer_label', 'lab_id']);
-        return view('batches', compact('batches', 'courses', 'labs', 'computers','students', 'statuses'));
-    }
-
     public function students(){
         $students = LabBooking::where('description', 'Exam')
             ->orWhere('description', 'Practical')
@@ -301,14 +287,14 @@ class LabBookingController extends Controller
         foreach ($labs as $lab) {
             LabBooking::create([
                 'title' => $request->input('description'),
-                'start' => $date . ' 00:00:00',
-                'end' => $date . ' 23:59:59',
+                'start' => $date . ' 08:00:00',
+                'end' => $date . ' 17:30:00',
                 'lab_id' => $lab->id,
                 'batch' => null,
                 'description' => 'Holiday',
                 'lecturer' => null,
                 'module' => null,
-                'color' => '#eeff00ff',
+                'color' => '#FBB05C',
                 'created_by' => auth()->user()->name,
                 'students_count' => 0,
                 'notes' => $request->input('description'),
@@ -342,14 +328,6 @@ class LabBookingController extends Controller
         }
     }
 
-    public function getBatches($course_id){
-        $batches = Batch::where('course_id', $course_id)
-                        ->orderBy('batch_number', 'asc')
-                        ->get(['id', 'batch_number']);
-
-        return response()->json($batches);
-    }
-
     public function eventStore(Request $request){
         // dd($request->all());
         $request->validate([
@@ -363,7 +341,7 @@ class LabBookingController extends Controller
             'start' => 'required',
             'end' => 'required',
         ]);
-        if($request->input('date') < Carbon::now()->format('m/d/Y')){
+        if($request->input('date') < Carbon::now('Asia/Colombo')->format('m/d/Y')){
             return redirect()->back()->with('error', 'Time travel is not supported yet! Please select a valid date.');
         }
 
@@ -375,7 +353,7 @@ class LabBookingController extends Controller
         }
 
         $batch = Batch::where('id', $request->input('batch'))->first();
-        // dd($batch);
+        //dd($batch,$request->input('invigilator'));
         $title = $request->input('module') . ' - ' . $batch->batch_number;
         // $date = Carbon::createFromFormat('m/d/Y', $request->input('date'))->format('Y-m-d');
         $date = $request->input('date');
@@ -407,7 +385,7 @@ class LabBookingController extends Controller
                 ' is already scheduled during this time.');
         }
 
-        if($request->input('invigilator') == 'other'){
+        if($request->input('invigilator') == 'Other'){
             $invigilatorName = $batch->owner;
         } else {
             $invigilatorName = $request->input('invigilator');
@@ -456,7 +434,7 @@ class LabBookingController extends Controller
             'start' => 'required',
             'end' => 'required',
         ]);
-        if($request->input('date') < Carbon::now()->format('m/d/Y')){
+        if($request->input('date') < Carbon::now('Asia/Colombo')->format('m/d/Y')){
             return redirect()->back()->with('error', 'Time travel is not supported yet! Please select a valid date.');
         }
 
@@ -606,8 +584,14 @@ class LabBookingController extends Controller
             'start' => 'required',
             'end' => 'required',
         ]);
-        if($request->input('date') < Carbon::now()->format('m/d/Y')){
-            return redirect()->back()->with('error', 'Time travel is not supported yet! Please select a valid date.');
+        $selectedDate = Carbon::parse($request->input('date'), 'Asia/Colombo');
+        $today = Carbon::now('Asia/Colombo')->startOfDay();
+
+        if ($selectedDate->lt($today)) {
+            return redirect()->back()->with(
+                'error',
+                'Time travel is not supported yet! Please select a valid date.'
+            );
         }
 
         if($request->input('start') == $request->input('end')){
@@ -812,11 +796,12 @@ class LabBookingController extends Controller
                     'module'        => $booking->module,
                     'batch'         => $booking->batch,
                     'description'   => $booking->description,
-                    'student_count' => $booking->student_count,
+                    'student_count' => $booking->students_count,
                     'notes'         => $booking->notes,
                     'computer_id'   => $booking->computer_id,
                     'computer_label' => optional($booking->computer)->computer_label,
-                    'created_by'    => $booking->created_by
+                    'created_by'    => $booking->created_by,
+                    'status'        => $booking->status,
                 ]
             ];
         });
@@ -870,6 +855,32 @@ class LabBookingController extends Controller
         $computers = Computer::where('status', 'active')
             ->get(['id', 'computer_label', 'lab_id']);
         return view('studentBooking', compact('batches', 'courses', 'labs', 'computers'));
+    }
+
+    public function getHolidays(){
+        $year = now()->year;
+
+        $month = now()->month;
+
+        $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'X-API-Key' => 'SLHAPIg3iWAr5ZrB4vUJqfu8tqMG',
+            ])
+            ->get('https://srilanka-holidays.vercel.app/api/v1/holidays', [
+                'year' => $year,
+                'month' => $month,
+                'format' => 'full'
+            ]);
+
+        if (!$response->successful()) {
+            return response()->json([
+                'error' => 'Failed to fetch holidays',
+                'status' => $response->status(),
+                'body' => $response->body()
+            ], 500);
+        }
+
+        return response()->json($response->json());
     }
 
 }

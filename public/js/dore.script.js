@@ -1097,7 +1097,7 @@ $.dore = function (element, options) {
               beginAtZero: true,
               stepSize: 1,
               min: 0,
-              max: response.max_value,
+              max: Number(response.max_value),
               padding: 0
             }
               }

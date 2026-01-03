@@ -10,7 +10,7 @@
                 <div class="mb-2">
                     <h1>Batches</h1>
                     <div class="top-right-button-container">
-                        <button type="button" class="btn btn-primary btn-lg top-right-button mr-1">ADD NEW</button>
+                        <button type="button" class="btn btn-primary btn-lg top-right-button mr-1" data-toggle="modal" data-target="#batchAddModal">ADD NEW</button>
                     </div>
                     
                 </div>
@@ -25,41 +25,44 @@
                         
                         <div class="d-block d-md-inline-block">
                             <div class="btn-group float-md-left mr-1 mb-1">
-                                <button class="btn btn-outline-dark btn-xs dropdown-toggle" type="button"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button class="btn btn-outline-dark btn-xs dropdown-toggle"
+                                        type="button"
+                                        data-toggle="dropdown"
+                                        id="courseDropdown">
                                     Course
                                 </button>
                                 <div class="dropdown-menu">
+                                    <a class="dropdown-item course-item" data-course="all" href="#">All Courses</a>
                                     @foreach($courses as $course)
-                                        <a class="dropdown-item" href="#">{{ $course->course_code }}</a>
+                                        <a class="dropdown-item course-item"
+                                        data-course="{{ $course->id }}"
+                                        href="#">
+                                            {{ $course->course_code }}
+                                        </a>
                                     @endforeach
                                 </div>
                             </div>
                             <div class="btn-group float-md-left mr-1 mb-1">
-                                <button class="btn btn-outline-dark btn-xs dropdown-toggle" type="button"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Status
+                                <button class="btn btn-outline-dark btn-xs dropdown-toggle"
+                                        type="button"
+                                        data-toggle="dropdown"
+                                        id="statusDropdown">
+                                    Active
                                 </button>
                                 <div class="dropdown-menu">
                                     @foreach($statuses as $status)
-                                        <a class="dropdown-item" href="#">{{ $status->status }}</a>
+                                        <a class="dropdown-item status-item"
+                                        data-status="{{ $status->status }}"
+                                        href="#">
+                                            {{ ucwords(str_replace('_', ' ', strtolower($status->status))) }}
+                                        </a>
                                     @endforeach
                                 </div>
                             </div>
+
                         </div>
                         <div class="float-md-right">
-                            <span class="text-muted text-small">Displaying 1-10 of 210 items </span>
-                            <button class="btn btn-outline-dark btn-xs dropdown-toggle" type="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                20
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#">10</a>
-                                <a class="dropdown-item active" href="#">20</a>
-                                <a class="dropdown-item" href="#">30</a>
-                                <a class="dropdown-item" href="#">50</a>
-                                <a class="dropdown-item" href="#">100</a>
-                            </div>
+                            <span class="text-muted text-small">{{ count($batches) }} batches</span>
                         </div>
                     </div>
                 </div>
@@ -68,75 +71,201 @@
         </div>
 
         <div class="row">
-            <div class="col-12 list" data-check-all="checkAll">
-
-                @foreach($batches as $batch)
-                    <div class="card d-flex flex-row mb-3">
-                        <div class="d-flex flex-grow-1 min-width-zero">
-                            <div
-                                class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
-                                <a class="list-item-heading mb-0 truncate w-30 w-xs-100" href="#">
-                                    {{ $batch->batch_number }}
-                                </a>
-                                <p class="mb-0 text-muted text-small w-15 w-xs-100">{{$batch->student_count}}</p>
-                                <p class="mb-0 text-muted text-small w-15 w-xs-100">{{$batch->course_code}}</p>
-                                <p class="mb-0 text-muted text-small w-15 w-xs-100">{{$batch->owner}}</p>
-                                <div class="w-15 w-xs-100">
-                                    @if($batch->status === 'Scheduled')
-                                        <span class="badge badge-pill badge-primary">Scheduled</span>
-                                    @elseif($batch->status === 'Active')
-                                        <span class="badge badge-pill badge-success">Active</span>
-                                    @elseif($batch->status === 'Delivery_Completed')
-                                        <span class="badge badge-pill badge-info">Delivery Completed</span>
-                                    @elseif($batch->status === 'Completed')
-                                        <span class="badge badge-pill badge-secondary">Completed</span>
-                                    @else
-                                        <span class="badge badge-pill badge-dark">{{ $batch->status }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                            <label class="custom-control custom-checkbox mb-1 align-self-center pr-4">
-                                <span class="iconsminds-file-edit"></span>
-                            </label>
-                        </div>
-                    </div>
-                @endforeach
-
-
-                <nav class="mt-4 mb-3">
-                    <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item ">
-                            <a class="page-link first" href="#">
-                                <i class="simple-icon-control-start"></i>
-                            </a>
-                        </li>
-                        <li class="page-item ">
-                            <a class="page-link prev" href="#">
-                                <i class="simple-icon-arrow-left"></i>
-                            </a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item ">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item ">
-                            <a class="page-link next" href="#" aria-label="Next">
-                                <i class="simple-icon-arrow-right"></i>
-                            </a>
-                        </li>
-                        <li class="page-item ">
-                            <a class="page-link last" href="#">
-                                <i class="simple-icon-control-end"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+            <div class="col-12 list" id="batchList">
+                @include('layouts.batchlist', ['batches' => $batches])
+                
             </div>
         </div>
     </div>
+
+    <!-- Add Batch Modal -->
+    <div class="modal fade" id="batchAddModal" tabindex="-1">
+        <div class="modal-dialog modal-md">
+            <form  method="POST" action="{{ route('batches.store') }}">
+                @csrf
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Batch</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label>Batch Number</label>
+                            <input type="text" class="form-control" name="batch_number" placeholder="Ex: DiIT 123" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Course</label>
+                            <select class="form-control" name="course_id" required>
+                                @foreach($courses as $course)
+                                    <option value="{{ $course->id }}">{{ $course->course_code }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" name="status" required>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Active">Active</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Owner</label>
+                            <input type="text" name="owner" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Student Count</label>
+                            <input type="number" name="student_count" class="form-control" required min="1" step="1">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Batch Modal -->
+    <div class="modal fade" id="batchEditModal" tabindex="-1">
+        <div class="modal-dialog modal-md">
+            <form id="batchEditForm">
+                @csrf
+                <input type="hidden" id="batch_id">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Batch</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label>Batch Number</label>
+                            <input type="text" class="form-control" id="batch_number" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" id="status">
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Active">Active</option>
+                                <option value="Delivery_Completed">Delivery Completed</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Owner</label>
+                            <input type="text" class="form-control" id="owner">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Student Count</label>
+                            <input type="number" class="form-control" id="student_count">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).on('click', '.openBatchModal', function () {
+
+            $('#batch_id').val($(this).data('id'));
+            $('#batch_number').val($(this).data('batch_number'));
+            $('#status').val($(this).data('status'));
+            $('#owner').val($(this).data('owner'));
+            $('#student_count').val($(this).data('student_count'));
+
+            $('#batchEditModal').modal('show');
+        });
+    </script>
+
+    <script>
+        $('#batchEditForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const id = $('#batch_id').val();
+
+            $.ajax({
+                url: `/batches/${id}`,
+                method: 'PUT',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    status: $('#status').val(),
+                    owner: $('#owner').val(),
+                    student_count: $('#student_count').val()
+                },
+                success: function () {
+                    $('#batchEditModal').modal('hide');
+                    location.reload(); // optional, remove if using live DOM updates
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            let selectedCourse = 'all';
+            let selectedStatus = 'Active'; // default
+
+            function loadBatches() {
+                $.ajax({
+                    url: "{{ route('filterBatches') }}",
+                    type: "GET",
+                    data: {
+                        course: selectedCourse,
+                        status: selectedStatus
+                    },
+                    success: function (response) {
+                        $('.list').html(response.html);
+                    }
+                });
+            }
+
+            // Course selection
+            $(document).on('click', '.course-item', function (e) {
+                e.preventDefault();
+
+                selectedCourse = $(this).data('course');
+                $('#courseDropdown').text($(this).text());
+
+                loadBatches();
+            });
+
+            // Status selection
+            $(document).on('click', '.status-item', function (e) {
+                e.preventDefault();
+
+                selectedStatus = $(this).data('status');
+                $('#statusDropdown').text($(this).text());
+
+                loadBatches();
+            });
+
+            // Initial load (Active + all courses)
+            loadBatches();
+        });
+    </script>
+
+
+
 @endsection

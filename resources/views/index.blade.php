@@ -157,7 +157,7 @@
                 <div class="card">
                     
                     <div class="card-body d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0"><span class="iconsminds-fire-flame-2"></span>Trending in {{$lastMonth}}</h6>
+                        <h6 class="mb-0"><span class="simple-icon-fire"></span> Trending in {{$lastMonth}}</h6>
                         
                     </div>
                 </div>

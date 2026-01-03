@@ -29,6 +29,32 @@
                             </div>
                         </a>
                     </div>
+
+                    <div class="col-md-3 col-lg-2 col-sm-4 col-6 mb-4">
+                        <a href="#eventGuide" class="card" data-toggle="modal">
+                            <div class="card-body text-center">
+                                <i class="simple-icon-info"></i>
+                                <p class="card-text font-weight-semibold mb-0">Event Guide</p>
+                            </div>
+                        </a>
+                        <!-- <div class="card">
+                            <div class="card-body">
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="mr-2" style="background-color: #d45284ff; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                    <span class="text-small">Exam</span>
+                                </div>
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="mr-2" style="background-color: #55ade3ff; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                    <span class="text-small">Practical</span>
+                                </div>
+
+                            </div>
+                        </div> -->
+                    </div>
+
+
                 </div>
 
                 <div class="row">
@@ -43,7 +69,7 @@
                                         var calendarEl = document.getElementById('calendar');
 
                                         var calendar = new FullCalendar.Calendar(calendarEl, {
-                                            initialView: 'dayGridMonth',
+                                            initialView: 'timeGridWeek',
                                             height: '100%',
 
                                             headerToolbar: {
@@ -77,7 +103,8 @@
                                                 document.getElementById('modalBookingID').value = info.event.id ?? "N/A";
                                                 document.getElementById('modalBookingCancelID').value = info.event.id ?? "N/A";
                                                 document.getElementById('modalBookingDeleteID').value = info.event.id ?? "N/A";
-
+                                                document.getElementById('modalStatus').innerText = info.event.extendedProps.status ?? "N/A";
+                                                $('#modalStatus').html(renderBookingStatusBadge(info.event.extendedProps.status));
                                                 $('#eventModal').modal('show');
                                             },
 
@@ -99,7 +126,7 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+                                <h5 class="modal-title" id="eventModalLabel">Event Details </h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -133,7 +160,7 @@
                                 </div>
 
                                 <div class="row mb-2">
-                                    <div class="col-4"><strong>Lecturer/Invigilator:</strong></div>
+                                    <div class="col-4"><strong>Invigilator:</strong></div>
                                     <div class="col-8" id="modalLecturer"></div>
                                 </div>
 
@@ -167,6 +194,11 @@
                                 <div class="row mb-2">
                                     <div class="col-4"><strong>Computer:</strong></div>
                                     <div class="col-8" id="modalComputerId"></div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-4"><strong>Status:</strong></div>
+                                    <div class="col-8" id="modalStatus"></div>
                                 </div>
                                 
                             </div>
@@ -846,8 +878,138 @@
                     </div>
                 </div>
 
+                <!-- Event Guide Modal -->
+                <div class="modal fade" id="eventGuide" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Event Guide</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    <strong>Colour Guide:</strong>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p>Individual Events:</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #d45284ff; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Exam</span>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #55ade3ff; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Practical</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-6"><p>Batch Events</p></div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #961446ff; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Batch Exam</span>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #1b6898ff; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Batch Practical</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-6"><p>Event Status</p></div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #28A745; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Completed</span>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #E0A800; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Cancelled</span>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #C82333; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Deleted</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-6"><p>Other Events</p></div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="mr-2" style="background-color: #FBB05C; width: 12px; height: 12px; border-radius: 50%; display: inline-block;" ></span>
+                                                <span class="text-small">Holidays</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                                <p style="text-align: justify;">
+                                    <strong>Creating Batch Events:</strong><br>
+                                    Use the "Batch Event" option to schedule events that involve any Batch, such as batch exams or practical sessions. Fill in the required details including date, time, lab, and invigilator.
+                                </p>
+                                <p style="text-align: justify;">
+                                    <strong>Creating Individual Student Events:</strong><br>
+                                    Use the "Student Event" option to create events for individual students, such as exams or practical sessions. Provide the student's ID along with other necessary information.
+                                </p>
+                                <p style="text-align: justify;">
+                                    <strong>Marking Events:</strong><br>
+                                    Make sure to mark events as "Completed" once they are done. If an event is cancelled or deleted, update its status accordingly to keep the records accurate.
+                                </p>
+                                <p style="text-align: justify;">
+                                    <strong>Computer Selection for Practical Events:</strong><br>
+                                    When scheduling a practical event for an individual student, selecting a computer is mandatory. This ensures that the student has access to the required resources during their practical session. <br>
+                                    After selecting a computer for a practical event, the system will display the software installed on that computer. This helps in verifying if the necessary software is available for the student's practical work.
+                                </p>
+                                <p style="text-align: justify;">
+                                    <strong>Reservation Availability:</strong><br>
+                                    Systems works as FIFO (First In First Out) basis. If a slot is already booked for a particular date and time, new reservations cannot be made for that same slot.
+                                    Also no one can reserve a any lab, any slot on a holiday.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+
+    <!-- View Modal Status Badge Script -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        function renderBookingStatusBadge(status) {
+            let badgeClass = 'badge-dark';
+            let label = status.replace('_', ' ');
+
+            switch (status) {
+                case 'Scheduled':
+                    badgeClass = 'badge-primary';
+                    break;
+                case 'Completed':
+                    badgeClass = 'badge-success';
+                    break;
+                case 'Cancelled':
+                    badgeClass = 'badge-warning';
+                    break;
+                case 'Deleted':
+                    badgeClass = 'badge-danger';
+                    break;
+            }
+
+            return `<span class="badge badge ${badgeClass}">
+                        ${label}
+                    </span>`;
+        }
+    </script>
 
 @endsection

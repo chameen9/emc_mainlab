@@ -15,6 +15,8 @@ class Computer extends Model
         'notes',
     ];
 
+    protected $primaryKey = 'id';
+
     public function lab()
     {
         return $this->belongsTo(Lab::class);

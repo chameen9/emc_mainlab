@@ -9,7 +9,6 @@ class Batch extends Model
     protected $fillable = [
         'course_id',
         'batch_number',
-        'department',
         'status',
         'owner',
         'student_count',

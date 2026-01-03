@@ -19,7 +19,7 @@
 
                 <div class="row mb-4">
                     
-                    <div class="col-lg-12 col-md-12 mb-4">
+                    <div class="col-lg-9 col-md-9 mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <!-- <h5 class="card-title">Light Heading</h5> -->
@@ -81,6 +81,17 @@
                         </div>
                     </div>
 
+                    <div class="col-lg-3 col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Upcoming Holidays</h5>
+                                <p class="card-text">Holidays affect all Computer Labs and no one can reserve a slot in the selected date(s).</p>  
+                                <div id="holidayList">
+                                    <p class="text-muted text-small mb-0">Loading holidays...</p>
+                                </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
@@ -139,6 +150,55 @@
             </div>
         </div>
     </div>
+
+    <!-- Fethch and display holidays -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $.ajax({
+                url: '/get-holidays',
+                type: 'GET',
+                success: function (response) {
+
+                    let holidays = response.holidays ?? [];
+                    let html = '';
+
+                    if (holidays.length === 0) {
+                        html = '<p class="text-muted text-small mb-0">No holidays found</p>';
+                    } else {
+                        holidays.forEach(holiday => {
+
+                            let types = holiday.type.join(', ');
+                            let startDate = new Date(holiday.start).toLocaleDateString();
+                            let endDate = new Date(holiday.end).toLocaleDateString();
+
+                            html += `
+                                <div class="mb-3">
+                                    <div class="font-weight-bold">${holiday.name}</div>
+                                    <div class="text-muted text-small">
+                                        ${startDate}${holiday.start !== holiday.end ? ' - ' + endDate : ''}
+                                    </div>
+                                    <span class="badge badge-pill badge-outline-info mt-1">
+                                        ${types}
+                                    </span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    $('#holidayList').html(html);
+                },
+                error: function () {
+                    $('#holidayList').html(
+                        '<p class="text-danger text-small mb-0">Failed to load holidays</p>'
+                    );
+                }
+            });
+
+        });
+    </script>
+
 
 
 @endsection

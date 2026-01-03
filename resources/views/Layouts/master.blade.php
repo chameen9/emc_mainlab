@@ -67,7 +67,7 @@
                 </a>
 
                 <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
-                    href="javascript:void(0);" onclick="copyToClipboard('/student-booking')">Copy Link</a>
+                    href="javascript:void(0);" onclick="copyToClipboard('/reserve')">Copy Link</a>
                 <script>
                     function copyToClipboard(text) {
                         navigator.clipboard.writeText(window.location.origin + text).then(() => {
@@ -77,12 +77,12 @@
                 </script>
 
                 <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
-                    href="/student-booking" >Visit Link</a>
+                    href="{{ route('studentBooking') }}" >Visit Link</a>
             </div>
 
 
             <a class="navbar-logo" href="">
-                Esoft Metro Campus Main Lab
+                Esoft Metro Campus - Main Lab
                 <!-- <span class="logo-single"></span> -->
             </a>
 
@@ -110,11 +110,16 @@
                         aria-expanded="false">
                         <span class="name">{{ auth()->user()->name ?? 'Guest' }}</span>
                         <span>
-                            <img alt="Profile Picture" src="img/profiles/diit.png" />
+                            <img
+                                src="{{ asset('img/profiles/' . (auth()->user()->image ?? 'default.png')) }}"
+                                alt="Profile Picture"
+                                style="width:35px;height:35px;"
+                            >
                         </span>
                     </button>
 
                     <div class="dropdown-menu dropdown-menu-right mt-3">
+                        <a class="dropdown-item" href="#editProfile" data-toggle="modal">Profile</a>
                         <a class="dropdown-item" href="#changePassword" data-toggle="modal">Change Password</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -141,14 +146,14 @@
                                 <i class="simple-icon-calendar"></i> Calendar
                             </a>
                         </li>
-                        <li class="{{ trim($__env->yieldContent('nav')) === 'computers' ? 'active' : '' }}">
-                            <a href="{{route('getComputers')}}">
-                                <i class="simple-icon-screen-desktop"></i> Computers
-                            </a>
-                        </li>
                         <li class="{{ trim($__env->yieldContent('nav')) === 'students' ? 'active' : '' }}">
                             <a href="{{route('students')}}">
                                 <i class="simple-icon-graduation"></i> Students
+                            </a>
+                        </li>
+                        <li class="{{ trim($__env->yieldContent('nav')) === 'computers' ? 'active' : '' }}">
+                            <a href="{{route('getComputers')}}">
+                                <i class="simple-icon-screen-desktop"></i> Computers
                             </a>
                         </li>
                         <li class="{{ trim($__env->yieldContent('nav')) === 'batches' ? 'active' : '' }}">
@@ -156,498 +161,20 @@
                                 <i class="simple-icon-notebook"></i> Batches
                             </a>
                         </li>
-                        <li class="{{ trim($__env->yieldContent('nav')) === 'users' ? 'active' : '' }}">
-                            <a href="{{route('users')}}">
-                                <i class="simple-icon-user"></i> Users
-                            </a>
-                        </li>
                         <li class="{{ trim($__env->yieldContent('nav')) === 'holidays' ? 'active' : '' }}">
                             <a href="{{route('holidays')}}">
                                 <i class="simple-icon-event"></i> Holidays
+                            </a>
+                        </li>
+                        <li class="{{ trim($__env->yieldContent('nav')) === 'users' ? 'active' : '' }}">
+                            <a href="{{route('users')}}">
+                                <i class="simple-icon-user"></i> Users
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
 
-            <!-- <div class="sub-menu">
-                <div class="scroll">
-                    <ul class="list-unstyled" data-link="dashboard">
-                        <li>
-                            <a href="Dashboard.Default.html">
-                                <i class="simple-icon-rocket"></i> <span class="d-inline-block">Default</span>
-                            </a>
-                        </li>
-                        <li class="active">
-                            <a href="Dashboard.Analytics.html">
-                                <i class="simple-icon-pie-chart"></i> <span class="d-inline-block">Analytics</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="Dashboard.Ecommerce.html">
-                                <i class="simple-icon-basket-loaded"></i> <span class="d-inline-block">Ecommerce</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="Dashboard.Content.html">
-                                <i class="simple-icon-doc"></i> <span class="d-inline-block">Content</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="list-unstyled" data-link="layouts" id="layouts">
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseAuthorization" aria-expanded="true"
-                                aria-controls="collapseAuthorization" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Authorization</span>
-                            </a>
-                            <div id="collapseAuthorization" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Pages.Auth.Login.html">
-                                            <i class="simple-icon-user-following"></i> <span
-                                                class="d-inline-block">Login</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Auth.Register.html">
-                                            <i class="simple-icon-user-follow"></i> <span
-                                                class="d-inline-block">Register</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Auth.ForgotPassword.html">
-                                            <i class="simple-icon-user-unfollow"></i> <span class="d-inline-block">Forgot
-                                                Password</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseProduct" aria-expanded="true"
-                                aria-controls="collapseProduct" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Product</span>
-                            </a>
-                            <div id="collapseProduct" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Pages.Product.List.html">
-                                            <i class="simple-icon-credit-card"></i> <span class="d-inline-block">Data
-                                                List</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Product.Thumbs.html">
-                                            <i class="simple-icon-list"></i> <span class="d-inline-block">Thumb
-                                                List</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Product.Images.html">
-                                            <i class="simple-icon-grid"></i> <span class="d-inline-block">Image
-                                                List</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Product.Detail.html">
-                                            <i class="simple-icon-book-open"></i> <span class="d-inline-block">Detail</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseProfile" aria-expanded="true"
-                                aria-controls="collapseProfile" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Profile</span>
-                            </a>
-                            <div id="collapseProfile" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Pages.Profile.Social.html">
-                                            <i class="simple-icon-share"></i> <span class="d-inline-block">Social</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Profile.Portfolio.html">
-                                            <i class="simple-icon-link"></i> <span class="d-inline-block">Portfolio</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseBlog" aria-expanded="true"
-                                aria-controls="collapseBlog" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Blog</span>
-                            </a>
-                            <div id="collapseBlog" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Pages.Blog.html">
-                                            <i class="simple-icon-list"></i> <span class="d-inline-block">List</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Blog.Detail.html">
-                                            <i class="simple-icon-book-open"></i> <span class="d-inline-block">Detail</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Blog.Detail.Alt.html">
-                                            <i class="simple-icon-picture"></i> <span class="d-inline-block">Detail
-                                                Alt</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseMisc" aria-expanded="true"
-                                aria-controls="collapseMisc" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Miscellaneous</span>
-                            </a>
-                            <div id="collapseMisc" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Pages.Misc.Coming.Soon.html">
-                                            <i class="simple-icon-hourglass"></i> <span class="d-inline-block">Coming
-                                                Soon</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Error.html">
-                                            <i class="simple-icon-exclamation"></i> <span
-                                                class="d-inline-block">Error</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Faq.html">
-                                            <i class="simple-icon-question"></i> <span class="d-inline-block">Faq</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Invoice.html">
-                                            <i class="simple-icon-bag"></i> <span class="d-inline-block">Invoice</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Knowledge.Base.html">
-                                            <i class="simple-icon-graduation"></i> <span class="d-inline-block">Knowledge
-                                                Base</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Mailing.html">
-                                            <i class="simple-icon-envelope-open"></i> <span
-                                                class="d-inline-block">Mailing</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Pricing.html">
-                                            <i class="simple-icon-diamond"></i> <span class="d-inline-block">Pricing</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Pages.Misc.Search.html">
-                                            <i class="simple-icon-magnifier"></i> <span class="d-inline-block">Search</span>
-                                        </a>
-                                    </li>
-
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                    <ul class="list-unstyled" data-link="applications">
-                        <li>
-                            <a href="Apps.MediaLibrary.html">
-                                <i class="simple-icon-picture"></i> <span class="d-inline-block">Library</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="Apps.Todo.List.html">
-                                <i class="simple-icon-check"></i> <span class="d-inline-block">Todo</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="Apps.Survey.List.html">
-                                <i class="simple-icon-calculator"></i> <span class="d-inline-block">Survey</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="Apps.Chat.html">
-                                <i class="simple-icon-bubbles"></i> <span class="d-inline-block">Chat</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="list-unstyled" data-link="ui">
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseForms" aria-expanded="true"
-                                aria-controls="collapseForms" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Forms</span>
-                            </a>
-                            <div id="collapseForms" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Ui.Forms.Components.html">
-                                            <i class="simple-icon-event"></i> <span class="d-inline-block">Components</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Forms.Layouts.html">
-                                            <i class="simple-icon-doc"></i> <span class="d-inline-block">Layouts</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Forms.Validation.html">
-                                            <i class="simple-icon-check"></i> <span class="d-inline-block">Validation</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Forms.Wizard.html">
-                                            <i class="simple-icon-magic-wand"></i> <span
-                                                class="d-inline-block">Wizard</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseDataTables" aria-expanded="true"
-                                aria-controls="collapseDataTables" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Datatables</span>
-                            </a>
-                            <div id="collapseDataTables" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Ui.Datatables.Rows.html">
-                                            <i class="simple-icon-screen-desktop"></i> <span class="d-inline-block">Full
-                                                Page UI</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Datatables.Scroll.html">
-                                            <i class="simple-icon-mouse"></i> <span class="d-inline-block">Scrollable</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Datatables.Pagination.html">
-                                            <i class="simple-icon-notebook"></i> <span
-                                                class="d-inline-block">Pagination</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Datatables.Default.html">
-                                            <i class="simple-icon-grid"></i> <span class="d-inline-block">Default</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseComponents" aria-expanded="true"
-                                aria-controls="collapseComponents" class="rotate-arrow-icon opacity-50">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Components</span>
-                            </a>
-                            <div id="collapseComponents" class="collapse show">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Ui.Components.Alerts.html">
-                                            <i class="simple-icon-bell"></i> <span class="d-inline-block">Alerts</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Badges.html">
-                                            <i class="simple-icon-badge"></i> <span class="d-inline-block">Badges</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Buttons.html">
-                                            <i class="simple-icon-control-play"></i> <span
-                                                class="d-inline-block">Buttons</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Cards.html">
-                                            <i class="simple-icon-layers"></i> <span class="d-inline-block">Cards</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="Ui.Components.Carousel.html">
-                                            <i class="simple-icon-picture"></i> <span class="d-inline-block">Carousel</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Charts.html">
-                                            <i class="simple-icon-chart"></i> <span class="d-inline-block">Charts</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Collapse.html">
-                                            <i class="simple-icon-arrow-up"></i> <span
-                                                class="d-inline-block">Collapse</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Dropdowns.html">
-                                            <i class="simple-icon-arrow-down"></i> <span
-                                                class="d-inline-block">Dropdowns</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Editors.html">
-                                            <i class="simple-icon-book-open"></i> <span
-                                                class="d-inline-block">Editors</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Icons.html">
-                                            <i class="simple-icon-star"></i> <span class="d-inline-block">Icons</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.InputGroups.html">
-                                            <i class="simple-icon-note"></i> <span class="d-inline-block">Input
-                                                Groups</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Jumbotron.html">
-                                            <i class="simple-icon-screen-desktop"></i> <span
-                                                class="d-inline-block">Jumbotron</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Modal.html">
-                                            <i class="simple-icon-docs"></i> <span class="d-inline-block">Modal</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Navigation.html">
-                                            <i class="simple-icon-cursor"></i> <span
-                                                class="d-inline-block">Navigation</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="Ui.Components.PopoverandTooltip.html">
-                                            <i class="simple-icon-pin"></i> <span class="d-inline-block">Popover &
-                                                Tooltip</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Sortable.html">
-                                            <i class="simple-icon-shuffle"></i> <span class="d-inline-block">Sortable</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Ui.Components.Tables.html">
-                                            <i class="simple-icon-grid"></i> <span class="d-inline-block">Tables</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                    <ul class="list-unstyled" data-link="menu" id="menuTypes">
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseMenuTypes" aria-expanded="true"
-                                aria-controls="collapseMenuTypes" class="rotate-arrow-icon">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Menu Types</span>
-                            </a>
-                            <div id="collapseMenuTypes" class="collapse show" data-parent="#menuTypes">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="Menu.Default.html">
-                                            <i class="simple-icon-control-pause"></i> <span
-                                                class="d-inline-block">Default</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Menu.Subhidden.html">
-                                            <i class="simple-icon-arrow-left mi-subhidden"></i> <span
-                                                class="d-inline-block">Subhidden</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Menu.Hidden.html">
-                                            <i class="simple-icon-control-start mi-hidden"></i> <span
-                                                class="d-inline-block">Hidden</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="Menu.Mainhidden.html">
-                                            <i class="simple-icon-control-rewind mi-hidden"></i> <span
-                                                class="d-inline-block">Mainhidden</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseMenuLevel" aria-expanded="true"
-                                aria-controls="collapseMenuLevel" class="rotate-arrow-icon collapsed">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Menu Levels</span>
-                            </a>
-                            <div id="collapseMenuLevel" class="collapse" data-parent="#menuTypes">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="#">
-                                            <i class="simple-icon-layers"></i> <span class="d-inline-block">Sub
-                                                Level</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" data-toggle="collapse" data-target="#collapseMenuLevel2"
-                                            aria-expanded="true" aria-controls="collapseMenuLevel2"
-                                            class="rotate-arrow-icon collapsed">
-                                            <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Another
-                                                Level</span>
-                                        </a>
-                                        <div id="collapseMenuLevel2" class="collapse">
-                                            <ul class="list-unstyled inner-level-menu">
-                                                <li>
-                                                    <a href="#">
-                                                        <i class="simple-icon-layers"></i> <span class="d-inline-block">Sub
-                                                            Level</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="collapse" data-target="#collapseMenuDetached" aria-expanded="true"
-                                aria-controls="collapseMenuDetached" class="rotate-arrow-icon collapsed">
-                                <i class="simple-icon-arrow-down"></i> <span class="d-inline-block">Detached</span>
-                            </a>
-                            <div id="collapseMenuDetached" class="collapse">
-                                <ul class="list-unstyled inner-level-menu">
-                                    <li>
-                                        <a href="#">
-                                            <i class="simple-icon-layers"></i> <span class="d-inline-block">Sub
-                                                Level</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="dont-close-menu">
-                                <a href="#">
-                                    <i class="simple-icon-arrow-right"></i> <span class="d-inline-block">Keep Sub Open</span>
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                    
-                </div>
-            </div> -->
         </div>
         <main>
             @yield('content')
@@ -683,7 +210,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Change Password</h5>
+                        <h5 class="modal-title">Change Your Password</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -695,15 +222,13 @@
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label for="name">Name *</label>
-                                        <input type="text" class="form-control" id="name" name="name"
+                                        <input type="hidden" class="form-control" id="name" name="name"
                                             placeholder="Enter Name" value="{{ Auth::user()->name }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label for="role">Role *</label>
-                                        <input type="text" class="form-control" id="role" name="role"
+                                        <input type="hidden" class="form-control" id="role" name="role"
                                             placeholder="Enter Role" value="{{ ucfirst(Auth::user()->role) }}" readonly>
                                     </div>
                                 </div>
@@ -713,8 +238,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <label for="email">Email *</label>
-                                        <input type="email" class="form-control" id="email" name="email"
+                                        <input type="hidden" class="form-control" id="email" name="email"
                                             placeholder="Enter Email" value="{{ Auth::user()->email }}" readonly>
                                     </div>
                                 </div>
@@ -761,8 +285,168 @@
             </div>
         </div>
 
-        @if ($message = Session::get('success'))
-            <<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Edit Profile Modal -->
+        <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Your Profile</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="POST" action="{{ route('editProfile') }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body">
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="name">Name *</label>
+                                        <input type="text" class="form-control" id="name" name="name"
+                                            placeholder="Enter Name" value="{{ Auth::user()->name }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="role">Role</label>
+                                        <input type="text" class="form-control" id="role" name="role"
+                                            placeholder="Enter Role" value="{{ ucfirst(Auth::user()->role) }}" readonly>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            placeholder="Enter Email" value="{{ Auth::user()->email }}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="select-from-library-container mb-1">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-6 col-xl-12">
+
+                                        <!-- Clickable upload area -->
+                                        <div class="select-from-library-button sfl-single mb-5"
+                                            id="imagePicker">
+                                            <div class="card d-flex flex-row mb-4 media-thumb-container justify-content-center align-items-center">
+                                                Click to change profile picture
+                                            </div>
+                                        </div>
+
+                                        <!-- Hidden file input -->
+                                        <input type="file"
+                                            id="imageInput"
+                                            name="image"
+                                            accept="image/*"
+                                            hidden>
+
+                                        <!-- Preview -->
+                                        <div class="selected-library-item sfl-selected-item mb-5 d-none"
+                                            id="imagePreviewWrapper" style="display: block;">
+                                            <div class="card d-flex flex-row media-thumb-container">
+                                                <a class="d-flex align-self-center">
+                                                    <img src=""
+                                                        alt="uploaded image"
+                                                        class="list-media-thumbnail responsive border-0"
+                                                        id="imagePreview"
+                                                        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" />
+                                                </a>
+
+                                                <div class="d-flex flex-grow-1 min-width-zero">
+                                                    <div class="card-body align-self-center">
+                                                        <p class="list-item-heading mb-1 truncate"
+                                                        id="imageName"></p>
+                                                    </div>
+
+                                                    <div class="pl-1 align-self-center">
+                                                        <a href="#"
+                                                        class="btn-link"
+                                                        id="removeImage">
+                                                            <i class="simple-icon-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Upload Preview Script -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                const imagePicker = document.getElementById('imagePicker');
+                const imageInput = document.getElementById('imageInput');
+                const imagePreviewWrapper = document.getElementById('imagePreviewWrapper');
+                const imagePreview = document.getElementById('imagePreview');
+                const imageName = document.getElementById('imageName');
+                const removeImage = document.getElementById('removeImage');
+
+                // Click card → open file chooser
+                imagePicker.addEventListener('click', function () {
+                    imageInput.click();
+                });
+
+                // File selected → show preview
+                imageInput.addEventListener('change', function () {
+                    const file = this.files[0];
+
+                    if (!file) return;
+
+                    // DEBUG (remove later)
+                    console.log('Selected file:', file);
+
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select an image file');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imageName.textContent = file.name;
+                        imagePreviewWrapper.classList.remove('d-none');
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+
+                // Remove image
+                removeImage.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    imageInput.value = '';
+                    imagePreview.src = '';
+                    imageName.textContent = '';
+                    imagePreviewWrapper.classList.add('d-none');
+                });
+
+            });
+        </script>
+
+        <!-- @if ($message = Session::get('success'))
+             <<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     Swal.fire({
@@ -775,9 +459,44 @@
                     });
                 });
             </script>
+            <a href="#" class="btn btn-outline-primary rounded notify-btn mb-1" data-from="top"
+                data-align="left">Top Left</a>
+
+            <div class="alert alert-success alert-dismissible fade show rounded mb-0" role="alert">
+                <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif -->
+
+        @if ($message = Session::get('success'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                $.notify(
+                    {
+                        message: "{{ $message }}"
+                    },
+                    {
+                        type: "success",
+                        allow_dismiss: true,
+                        newest_on_top: true,
+                        placement: {
+                            from: "top",
+                            align: "right"
+                        },
+                        delay: 3000,
+                        animate: {
+                            enter: "animated fadeInDown",
+                            exit: "animated fadeOutUp"
+                        }
+                    }
+                );
+            });
+        </script>
         @endif
 
-        @if ($message = Session::get('error'))
+        <!-- @if ($message = Session::get('error'))
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
@@ -791,9 +510,35 @@
                     });
                 });
             </script>
-        @endif 
+        @endif  -->
 
-        @if (count($errors)>0)
+        @if ($message = Session::get('error'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                $.notify(
+                    {
+                        message: "{{ $message }}"
+                    },
+                    {
+                        type: "danger",
+                        allow_dismiss: true,
+                        newest_on_top: true,
+                        placement: {
+                            from: "top",
+                            align: "right"
+                        },
+                        delay: 4000,
+                        animate: {
+                            enter: "animated fadeInDown",
+                            exit: "animated fadeOutUp"
+                        }
+                    }
+                );
+            });
+        </script>
+        @endif
+
+        <!-- @if (count($errors)>0)
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
@@ -812,6 +557,32 @@
                     });
                 });
             </script>
+        @endif -->
+
+        @if (count($errors)>0)
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                let errorMessages = `{!! implode('<br>', $errors->all()) !!}`;
+
+                $.notify(
+                    {
+                        message: errorMessages
+                    },
+                    {
+                        type: "warning",
+                        allow_dismiss: true,
+                        newest_on_top: true,
+                        timer: 5000,
+                        placement: {
+                            from: "top",
+                            align: "right"
+                        }
+                    }
+                );
+
+            });
+        </script>
         @endif
 
         <script src="js/vendor/jquery-3.3.1.min.js"></script>
@@ -830,6 +601,7 @@
         <script src="js/vendor/mousetrap.min.js"></script>
         <script src="js/dore.script.js"></script>
         <script src="js/scripts.js"></script>
+        <script src="js/vendor/bootstrap-notify.min.js"></script>
     </body>
 
 </html>

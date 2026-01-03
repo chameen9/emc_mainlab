@@ -73,7 +73,7 @@ class ChartController extends Controller
         return response()->json([
             'labels' => $labels,
             'data' => $data,
-            'batch_data' => $batchdata,
+            //'batch_data' => $batchdata,
             'max_value' => $maxValue,
         ]);
     }

@@ -35,4 +35,45 @@ class UserController extends Controller
         // Redirect back with success message
         return redirect()->back()->with('success', 'User created successfully!');
     }
+
+    public function editProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        //dd($request->all());
+        // Validate the request data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Update user details
+        $user->name = $request->name;
+
+        // Handle profile image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $extension = $image->getClientOriginalExtension();
+            $imageName = time().'.'.$extension;
+
+            if (app()->environment('local')) {
+                $folderPath = public_path('img/profiles/');
+            } else {
+                $folderPath = base_path('/img/profiles/');
+            }
+
+            if (!file_exists($folderPath)) mkdir($folderPath, 0777, true);
+            $fullImagePath = $folderPath . $imageName;
+
+            $image->move($folderPath, $imageName);
+
+            // $image->move(public_path('img/profiles'), $imageName);
+            $user->image = $imageName;
+        }
+
+        $user->save();
+
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Profile updated successfully!');
+    }
 }
