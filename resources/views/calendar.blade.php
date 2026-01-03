@@ -72,6 +72,8 @@
                                             initialView: 'timeGridWeek',
                                             height: '100%',
 
+                                            firstDay: 1, // Start week on Monday
+
                                             headerToolbar: {
                                                 left: 'prev,next today',
                                                 center: 'title',
