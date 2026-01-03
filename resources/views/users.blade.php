@@ -27,7 +27,7 @@
                                 <table class="table table-responsive-sm">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
+                                            <th>User</th>
                                             <th>Email</th>
                                             <th>Verified</th>
                                             <th>Role</th>
@@ -36,7 +36,22 @@
                                     <tbody>
                                         @foreach($users as $user)
                                             <tr>
-                                                <td>{{ $user->name }}</td>
+                                                <td>
+                                                    @if($user->image)
+                                                    <img
+                                                        src="{{ asset('img/profiles/' . ($user->image ?? 'default.png')) }}"
+                                                        alt=""
+                                                        style="width:35px;height:35px;border-radius:50%;object-fit:cover;"
+                                                    >
+                                                    @else
+                                                    <img
+                                                        src="{{ asset('img/profiles/default.png') }}"
+                                                        alt=""
+                                                        style="width:35px;height:35px;border-radius:50%;object-fit:cover;"
+                                                    >
+                                                    @endif
+                                                    {{ $user->name }}
+                                                </td>
                                                 <td>{{ $user->email }}</td>
                                                 <td>{{ $user->email_verified_at ? 'Yes' : 'No' }}</td>
                                                 <td>{{ ucfirst($user->role) }}</td>

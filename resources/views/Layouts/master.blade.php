@@ -110,11 +110,19 @@
                         aria-expanded="false">
                         <span class="name">{{ auth()->user()->name ?? 'Guest' }}</span>
                         <span>
+                            @if(auth()->user()->image)
                             <img
                                 src="{{ asset('img/profiles/' . (auth()->user()->image ?? 'default.png')) }}"
                                 alt="Profile Picture"
                                 style="width:35px;height:35px;"
                             >
+                            @else
+                            <img
+                                src="{{ asset('img/profiles/default.png') }}"
+                                alt="Profile Picture"
+                                style="width:35px;height:35px;"
+                            >
+                            @endif
                         </span>
                     </button>
 
