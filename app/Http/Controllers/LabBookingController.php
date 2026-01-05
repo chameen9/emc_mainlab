@@ -11,8 +11,10 @@ use App\Models\Course;
 use App\Models\Batch;
 use App\Models\Module;
 use App\Models\User;
+use App\Models\BookingConfirmationMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use App\Jobs\SendBookingConfirmationMail;
 
 class LabBookingController extends Controller
 {
@@ -583,6 +585,7 @@ class LabBookingController extends Controller
             'batch' => 'required|exists:batches,id',
             'start' => 'required',
             'end' => 'required',
+            'email' => 'required|email',
         ]);
         $selectedDate = Carbon::parse($request->input('date'), 'Asia/Colombo');
         $today = Carbon::now('Asia/Colombo')->startOfDay();
@@ -706,7 +709,7 @@ class LabBookingController extends Controller
             $color = '#686868ff'; // Default color
         }
 
-        LabBooking::create([
+        $booking = LabBooking::create([
             'title' => $title,
             'start' => $start,
             'end' => $end,
@@ -721,8 +724,17 @@ class LabBookingController extends Controller
             'notes' => $request->input('notes'),
             'computer_id'=> $computerID,
             'status' => 'Scheduled',
-            // Add other fields as necessary
         ]);
+
+        $confirmation = BookingConfirmationMail::create([
+            'email' => $request->input('email'),
+            'booking_id' => $booking->id,
+            'status' => 'Pending',
+            'sent_at' => null,
+        ]);
+        $thisBooking = LabBooking::with(['lab', 'computer'])->find($booking->id);
+
+        dispatch(new SendBookingConfirmationMail($thisBooking, $confirmation));
 
         return redirect()->back()->with('success', 'Reservation created successfully!');
     }

@@ -303,11 +303,20 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-group">
                                             <label class="form-group has-float-label mb-4">
                                             <input type="text" name="notes" class="form-control" id="notes" placeholder="Enter any notes here">
                                             <span>Notes (Optional)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-group has-float-label mb-4">
+                                            <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email" required>
+                                            <span>Email *</span>
                                             </label>
                                         </div>
                                     </div>
@@ -429,8 +438,12 @@
                                 });
                                 </script>
 
-                                <div class="d-flex justify-content-end align-items-center">
-                                    <button class="btn btn-primary btn-lg btn-shadow" type="submit">Make Reservation</button>
+                                <div class="row">
+                                    <div class="col-12 lg-12 sm-12 xs-12">
+                                        <div class="d-flex justify-content-end align-items-center">
+                                            <button class="btn btn-primary btn-lg btn-shadow" type="submit">Make Reservation</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>

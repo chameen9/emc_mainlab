@@ -82,7 +82,7 @@
 
 
             <a class="navbar-logo" href="">
-                Esoft Metro Campus - Main Lab
+                EMC Galle
                 <!-- <span class="logo-single"></span> -->
             </a>
 
