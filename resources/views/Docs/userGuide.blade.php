@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('Layouts.master')
 
 @section('title', 'User Guide')
 @section('nav', 'user-guide')
