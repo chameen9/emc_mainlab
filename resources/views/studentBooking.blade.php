@@ -118,7 +118,7 @@
                                         <div class="form-group">
                                             <label class="form-group has-float-label mb-4">
                                             <select name="module" class="form-control select2-single" id="imodule" data-width="100%" required>
-                                                <option value="">Pick a Module</option>
+                                                <option value="">Pick the Course First</option>
                                                 
                                             </select>
                                             <span>Module</span>
@@ -130,7 +130,7 @@
                                         <div class="form-group">
                                             <label class="form-group has-float-label mb-4">
                                             <select name="batch" class="form-control select2-single" id="ibatch" data-width="100%" required>
-                                                <option value="">Pick your Batch</option>
+                                                <option value="">Pick the Course First</option>
                                                 
                                             </select>
                                             <span>Batch</span>

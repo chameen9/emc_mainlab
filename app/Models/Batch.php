@@ -10,7 +10,7 @@ class Batch extends Model
         'course_id',
         'batch_number',
         'status',
-        'owner',
+        'lecturer_id',
         'student_count',
     ];
 

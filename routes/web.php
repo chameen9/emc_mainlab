@@ -19,11 +19,16 @@ Route::middleware(['auth', 'role:invigilator,admin'])->group(function () {
     Route::get('/', 'App\Http\Controllers\LabBookingController@index')->name('index');
     Route::get('/computers', 'App\Http\Controllers\LabBookingController@getComputers')->name('getComputers');
     Route::get('/calendar', 'App\Http\Controllers\LabBookingController@calendar')->name('calendar');
+    Route::get('/calendar-task-view', 'App\Http\Controllers\LabBookingController@calendarTaskView')->name('calendarTaskView');
     Route::get('/students', 'App\Http\Controllers\LabBookingController@students')->name('students');
+    Route::get('/user-guide', function () {
+        return view('Docs.userGuide');
+    })->name('userGuide');
 
     //Manage Bookings
     Route::post('/event-store', 'App\Http\Controllers\LabBookingController@eventStore')->name('eventStore');
     Route::post('/individual-event-store', 'App\Http\Controllers\LabBookingController@individualEventStore')->name('individualEventStore');
+    Route::post('/permanent-individual-event-store', 'App\Http\Controllers\LabBookingController@permanentIndividualEventStore')->name('permanentIndividualEventStore');
     Route::post('/booking-complete', 'App\Http\Controllers\LabBookingController@bookingComplete')->name('bookingComplete');
     Route::post('/booking-cancel', 'App\Http\Controllers\LabBookingController@bookingCancel')->name('bookingCancel');
     Route::post('/booking-delete', 'App\Http\Controllers\LabBookingController@bookingDelete')->name('bookingDelete');
@@ -43,16 +48,22 @@ Route::middleware(['auth', 'role:invigilator,admin'])->group(function () {
     //User Profile
     Route::post('/user-change-password', 'App\Http\Controllers\AuthController@changePassword')->name('changePassword');
     Route::post('/edit-profile', 'App\Http\Controllers\UserController@editProfile')->name('editProfile');
+
+    //Ajax Tables
+    Route::get('/bookings/table', 'App\Http\Controllers\LabBookingController@getBookingTable')->name('getBookingTable');
+
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    //Manage Users
-    Route::get('/users', 'App\Http\Controllers\LabBookingController@users')->name('users');
+    //Manage People - Admin Only
+    Route::get('/people', 'App\Http\Controllers\LabBookingController@people')->name('people');
     Route::post('/add-user', 'App\Http\Controllers\UserController@addUser')->name('addUser');
+    Route::post('/add-lecturer', 'App\Http\Controllers\UserController@addLecturer')->name('addLecturer');
+    Route::post('/update-lecturer', 'App\Http\Controllers\UserController@updateLecturer')->name('updateLecturer');
 
     //Manage Batches - Admin Only
-    Route::put('/batches/{id}', 'App\Http\Controllers\BatchController@update')->name('updateBatch');
+    Route::post('/batch-update', 'App\Http\Controllers\BatchController@update')->name('updateBatch');
     Route::post('/batch-store', 'App\Http\Controllers\BatchController@store')->name('batches.store');
 
     //Manage Holidays - Admin Only

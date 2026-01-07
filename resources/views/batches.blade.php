@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('Layouts.master')
 
 @section('title', 'Batches')
 @section('nav', 'batches')
@@ -72,7 +72,7 @@
 
         <div class="row">
             <div class="col-12 list" id="batchList">
-                @include('layouts.batchlist', ['batches' => $batches])
+                @include('Partials.Batch.batchlist', ['batches' => $batches])
                 
             </div>
         </div>
@@ -115,8 +115,15 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Owner</label>
-                            <input type="text" name="owner" class="form-control" required>
+                            <label>Owner (Lecturer)</label>
+                            <select class="form-control" name="lecturer_id" id="lecturer_id">
+                                <option value="">Assign a Lecturer</option>
+                                @foreach($lecturers as $lecturer)
+                                    <option value="{{ $lecturer->id }}">
+                                        {{ $lecturer->title }}. {{ $lecturer->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -137,9 +144,9 @@
     <!-- Edit Batch Modal -->
     <div class="modal fade" id="batchEditModal" tabindex="-1">
         <div class="modal-dialog modal-md">
-            <form id="batchEditForm">
+            <form id="batchEditForm" method="POST" action="{{ route('updateBatch') }}">
                 @csrf
-                <input type="hidden" id="batch_id">
+                <input type="hidden" name="batch_id" id="batch_id">
 
                 <div class="modal-content">
                     <div class="modal-header">
@@ -151,12 +158,12 @@
 
                         <div class="form-group">
                             <label>Batch Number</label>
-                            <input type="text" class="form-control" id="batch_number" readonly>
+                            <input type="text" class="form-control" name="batch_number" id="batch_number" readonly>
                         </div>
 
                         <div class="form-group">
                             <label>Status</label>
-                            <select class="form-control" id="status">
+                            <select class="form-control" name="status" id="status" required>
                                 <option value="Scheduled">Scheduled</option>
                                 <option value="Active">Active</option>
                                 <option value="Delivery_Completed">Delivery Completed</option>
@@ -165,13 +172,21 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Owner</label>
-                            <input type="text" class="form-control" id="owner">
+                            <label>Owner (Lecturer)</label>
+                            <select class="form-control" name="lecturer_id" id="edit_lecturer_id" required>
+                                <option value="">Not Assigned</option>
+                                @foreach($lecturers as $lecturer)
+                                    <option value="{{ $lecturer->id }}">
+                                        {{ $lecturer->title }}. {{ $lecturer->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+
 
                         <div class="form-group">
                             <label>Student Count</label>
-                            <input type="number" class="form-control" id="student_count">
+                            <input type="number" name="student_count" class="form-control" id="student_count" required>
                         </div>
 
                     </div>
@@ -188,17 +203,17 @@
     <script>
         $(document).on('click', '.openBatchModal', function () {
 
-            $('#batch_id').val($(this).data('id'));
+            $('#batch_id').val($(this).data('batch_id'));
             $('#batch_number').val($(this).data('batch_number'));
             $('#status').val($(this).data('status'));
-            $('#owner').val($(this).data('owner'));
+            $('#edit_lecturer_id').val($(this).data('lecturer_id') ?? '');
             $('#student_count').val($(this).data('student_count'));
 
             $('#batchEditModal').modal('show');
         });
     </script>
 
-    <script>
+    <!-- <script>
         $('#batchEditForm').on('submit', function (e) {
             e.preventDefault();
 
@@ -206,20 +221,26 @@
 
             $.ajax({
                 url: `/batches/${id}`,
-                method: 'PUT',
+                type: 'PUT',
                 data: {
                     _token: '{{ csrf_token() }}',
                     status: $('#status').val(),
-                    owner: $('#owner').val(),
+                    lecturer_id: $('#lecturer_id').val(),
                     student_count: $('#student_count').val()
                 },
+                
                 success: function () {
                     $('#batchEditModal').modal('hide');
-                    location.reload(); // optional, remove if using live DOM updates
+                    location.reload();
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert('Update failed. Check logs.');
                 }
             });
         });
-    </script>
+    </script> -->
+
 
     <script>
         $(document).ready(function () {

@@ -8,12 +8,19 @@ use App\Models\Course;
 use App\Models\LabBooking;
 use App\Models\Lab;
 use App\Models\Computer;
+use App\Models\Lecturer;
 
 class BatchController extends Controller
 {
     public function index(){
         $batches = Batch::join('courses', 'batches.course_id', '=', 'courses.id')
-            ->select('batches.*', 'courses.course_code as course_code')
+            ->leftJoin('lecturers', 'batches.lecturer_id', '=', 'lecturers.id')
+            ->select(
+                'batches.*',
+                'courses.course_code as course_code',
+                'lecturers.title as lecturer_title',
+                'lecturers.name as lecturer_name'
+            )
             ->get();
         $courses = Course::all();
         $students = LabBooking::where('description', 'Exam')
@@ -22,33 +29,45 @@ class BatchController extends Controller
         $statuses = Batch::select('status')->distinct()->get();
         $computers = Computer::where('status', 'active')
             ->get(['id', 'computer_label', 'lab_id']);
-        return view('batches', compact('batches', 'courses', 'computers','students', 'statuses'));
+
+        $lecturers = Lecturer::where('status', 'active')->get();
+
+        return view('batches', compact('batches', 'courses', 'computers','students', 'statuses', 'lecturers'));
     }
 
-    //Ajax call to get batches based on course id
+    // Ajax call to get batches based on course id
     public function getBatches($course_id){
-        $batches = Batch::where('course_id', $course_id)
-            ->whereIn('status', ['Active', 'Scheduled'])
-            ->orderBy('batch_number', 'desc')
-            ->get([
-                'id',
-                'batch_number',
-                'status',
-                'owner',
-                'student_count'
-            ]);
+        $batches = Batch::query()
+            ->join('courses', 'batches.course_id', '=', 'courses.id')
+            ->leftJoin('lecturers', 'batches.lecturer_id', '=', 'lecturers.id')
+            ->where('batches.course_id', $course_id)
+            ->whereIn('batches.status', ['Active', 'Scheduled'])
+            ->select(
+                'batches.*',
+                'courses.course_code as course_code',
+                'lecturers.title as lecturer_title',
+                'lecturers.name as lecturer_name',
+                'lecturers.id as lec_id',
+            )
+            ->orderBy('batches.batch_number', 'desc')
+            ->get();
 
         return response()->json($batches);
     }
 
     public function filterBatches(Request $request){
-        $query = Batch::join('courses', 'batches.course_id', '=', 'courses.id')
+        $query = Batch::query()
+            ->join('courses', 'batches.course_id', '=', 'courses.id')
+            ->leftJoin('lecturers', 'batches.lecturer_id', '=', 'lecturers.id')
             ->select(
                 'batches.*',
-                'courses.course_code as course_code'
+                'courses.course_code as course_code',
+                'lecturers.title as lecturer_title',
+                'lecturers.id as lecturer_id',
+                'lecturers.name as lecturer_name',
             );
 
-        // Status filter (default handled on frontend)
+        // Status filter
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('batches.status', $request->status);
         }
@@ -64,7 +83,7 @@ class BatchController extends Controller
 
         return response()->json([
             'count' => $batches->count(),
-            'html'  => view('layouts.batchlist', compact('batches'))->render()
+            'html'  => view('Partials.Batch.batchlist', compact('batches'))->render()
         ]);
     }
 
@@ -78,20 +97,31 @@ class BatchController extends Controller
         $batch->course_id = $request->course_id;
         $batch->batch_number = $request->batch_number;
         $batch->status = $request->status;
-        $batch->owner = $request->owner;
+        $batch->lecturer_id = $request->lecturer_id;
         $batch->student_count = $request->student_count;
         $batch->save();
 
         return back()->with('success', 'Batch created successfully.');
     }
 
-    public function update(Request $request, $id){
-        Batch::where('id', $id)->update([
-            'status' => $request->status,
-            'owner' => $request->owner,
-            'student_count' => $request->student_count
+    public function update(Request $request){
+        //dd($request->all());
+        $request->validate([
+            'status'        => 'required|string',
+            'lecturer_id'   => 'nullable|exists:lecturers,id',
+            'student_count' => 'required|integer|min:0'
         ]);
 
-        return response()->json(['success' => true]);
+        $batch = Batch::findOrFail($request->batch_id);
+
+        $batch->update([
+            'status'        => $request->status,
+            'lecturer_id'   => $request->lecturer_id,
+            'student_count' => $request->student_count
+        ]);
+        //dd($request->all());
+
+        return back()->with('success', 'Batch updated successfully.');
     }
+
 }

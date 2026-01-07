@@ -12,9 +12,17 @@ use App\Models\Batch;
 use App\Models\Module;
 use App\Models\User;
 use App\Models\BookingConfirmationMail;
+use App\Models\BookingCompletionMail;
+use App\Models\BookingCancelationMail;
+use App\Models\Lecturer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use App\Jobs\SendBookingConfirmationMail;
+use App\Jobs\SendBookingCompletionMail;
+use App\Jobs\SendBookingCancelationMail;
+use App\Jobs\SendLecturerBookingStatusMail;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PermanentBookingSummary;
 
 class LabBookingController extends Controller
 {
@@ -253,6 +261,16 @@ class LabBookingController extends Controller
         return view('calendar', compact('batches', 'courses', 'labs', 'computers', 'invigilators'));
     }
 
+    public function calendarTaskView(){
+        $batches = Batch::all();
+        $courses = Course::all();
+        $labs = Lab::all();
+        $computers = Computer::where('status', 'active')
+            ->get(['id', 'computer_label', 'lab_id']);
+        $invigilators = User::where('role', 'invigilator')->get();
+        return view('calendarTaskView', compact('batches', 'courses', 'labs', 'computers', 'invigilators'));
+    }
+
     public function students(){
         $students = LabBooking::where('description', 'Exam')
             ->orWhere('description', 'Practical')
@@ -265,9 +283,10 @@ class LabBookingController extends Controller
         return view('students', compact('batches', 'courses', 'labs', 'computers','students'));
     }
 
-    public function users(){
+    public function people(){
         $users = User::all();
-        return view('users', compact('users'));
+        $lecturers = Lecturer::all();
+        return view('people', compact(['users','lecturers']));
     }
 
     public function holidays(){
@@ -354,7 +373,16 @@ class LabBookingController extends Controller
             return redirect()->back()->with('error', 'Time travel is not supported yet! Start time cannot be after end time.');
         }
 
-        $batch = Batch::where('id', $request->input('batch'))->first();
+        $batch = Batch::query()
+            ->leftJoin('lecturers', 'batches.lecturer_id', '=', 'lecturers.id')
+            ->where('batches.id', $request->input('batch'))
+            ->select(
+                'batches.*',
+                'lecturers.title as lecturer_title',
+                'lecturers.name as lecturer_name',
+                'lecturers.email as lecturer_email'
+            )
+            ->first();
         //dd($batch,$request->input('invigilator'));
         $title = $request->input('module') . ' - ' . $batch->batch_number;
         // $date = Carbon::createFromFormat('m/d/Y', $request->input('date'))->format('Y-m-d');
@@ -388,7 +416,7 @@ class LabBookingController extends Controller
         }
 
         if($request->input('invigilator') == 'Other'){
-            $invigilatorName = $batch->owner;
+            $invigilatorName = $batch->lecturer_title . '. ' . $batch->lecturer_name;
         } else {
             $invigilatorName = $request->input('invigilator');
         }
@@ -404,7 +432,7 @@ class LabBookingController extends Controller
             $color = '#686868ff'; // Default color
         }
 
-        LabBooking::create([
+        $booking = LabBooking::create([
             'title' => $title,
             'start' => $start,
             'end' => $end,
@@ -420,6 +448,16 @@ class LabBookingController extends Controller
             'status' => 'Scheduled',
             // Add other fields as necessary
         ]);
+
+        $confirmation = BookingConfirmationMail::create([
+            'email' => $batch->lecturer_email,
+            'booking_id' => $booking->id,
+            'status' => 'Pending',
+            'sent_at' => null,
+        ]);
+        $thisBooking = LabBooking::with(['lab'])->find($booking->id);
+
+        dispatch(new SendLecturerBookingStatusMail($thisBooking, 'Confirmation', $confirmation->id));
 
         return redirect()->back()->with('success', 'Event created successfully!');
     }
@@ -572,6 +610,165 @@ class LabBookingController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Reservation created successfully!');
+    }
+
+    public function permanentIndividualEventStore(Request $request){
+        $request->validate([
+            'student_id'  => 'required|string|max:255',
+            'email'       => 'required|email|max:255',
+            'day'         => 'required|string',            // e.g. Monday
+            'duration'    => 'required|integer|min:1',     // months
+            'start'       => 'required',
+            'end'         => 'required',
+            'description' => 'required|string|max:255',
+            'course_id'   => 'required|exists:courses,id',
+            'module'      => 'required|string|max:255',
+            'batch_id'    => 'required|exists:batches,id',
+            'computer_id' => 'required|exists:computers,id',
+        ]);
+
+        if ($request->start >= $request->end) {
+            return back()->with('error', 'End time must be after start time.');
+        }
+
+        $batch = Batch::findOrFail($request->batch_id);
+
+        $dayName   = ucfirst(strtolower($request->day)); // Normalize
+        $months    = (int) $request->duration;
+        $labId     = 1; // Main Lab
+        $today     = Carbon::now('Asia/Colombo')->startOfDay();
+        $endDate   = $today->copy()->addMonths($months)->endOfDay();
+
+        if ($request->input('description') == 'Exam') {
+            $color = '#d45284ff';
+        }
+        else if ($request->input('description') == 'Practical'){
+            $color = '#55ade3ff';
+        }
+        else{
+            $color = '#686868ff'; // Default color
+        }
+
+        $reservedDates = [];
+        $skippedDates  = [];
+
+        // Find first matching weekday
+        $currentDate = $today->copy();
+        while ($currentDate->format('l') !== $dayName) {
+            $currentDate->addDay();
+        }
+
+        while ($currentDate->lte($endDate)) {
+
+            $date  = $currentDate->format('Y-m-d');
+            $start = $date . ' ' . $request->start . ':00';
+            $end   = $date . ' ' . $request->end   . ':00';
+
+            // ❌ Block by Batch Exams / Practicals / Holidays
+            $labConflict = LabBooking::where('lab_id', $labId)
+                ->where('status', 'Scheduled')
+                ->whereDate('start', $date)
+                ->whereIn('description', ['Batch Exam', 'Batch Practical', 'Holiday'])
+                ->where(function ($q) use ($start, $end) {
+                    $q->where('start', '<', $end)
+                    ->where('end', '>', $start);
+                })
+                ->exists();
+
+            // ❌ Computer conflict
+            $computerConflict = LabBooking::where('computer_id', $request->computer_id)
+                ->where('status', 'Scheduled')
+                ->whereDate('start', $date)
+                ->where(function ($q) use ($start, $end) {
+                    $q->where('start', '<', $end)
+                    ->where('end', '>', $start);
+                })
+                ->exists();
+
+            if ($labConflict) {
+                $skippedDates[] = [
+                    'date'   => $date,
+                    'reason' => 'Lab unavailable (Holiday / Batch Exam / Batch Practical)'
+                ];
+            }
+            elseif ($computerConflict) {
+                $skippedDates[] = [
+                    'date'   => $date,
+                    'reason' => 'Selected computer already reserved'
+                ];
+            }
+            else {
+                $thisBooking = LabBooking::create([
+                    'title'          => $request->student_id . ' ' . $request->module,
+                    'start'          => $start,
+                    'end'            => $end,
+                    'lab_id'         => $labId,
+                    'batch'          => $batch->batch_number,
+                    'description'    => $request->description,
+                    'lecturer'       => 'Any',
+                    'notes'          => '# Permanent Reservation',
+                    'module'         => $request->module,
+                    'color'          => $color,
+                    'created_by'     => auth()->user()->name,
+                    'students_count' => 1,
+                    'computer_id'    => $request->computer_id,
+                    'status'         => 'Scheduled',
+                ]);
+
+                $confirmation = BookingConfirmationMail::create([
+                    'email' => $request->input('email'),
+                    'booking_id' => $thisBooking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+
+                $reservedDates[] = $date;
+            }
+
+            $currentDate->addWeek(); // Next same weekday
+        }
+
+        $reservedCount = count($reservedDates);
+        $skippedCount  = count($skippedDates);
+
+        $computer = Computer::find($request->computer_id);
+        $lab = Lab::find($labId);
+
+        // 📧 Send summary email
+        Mail::to($request->email)->send(
+            new PermanentBookingSummary(
+                $request->student_id,
+                $request->module,
+                $batch->batch_number,
+                $request->start,
+                $request->end,
+                $computer->computer_label,
+                $lab->lab_name,
+                $reservedDates,
+                $skippedDates
+            )
+        );
+
+        return back()->with([
+            'success' => 'Permanent booking processed successfully. Summary email sent.',
+            'booking_summary' => [
+                'reserved' => $reservedCount,
+                'skipped'  => $skippedCount
+            ]
+        ]);
+    }
+
+    private function weekdayToCarbon(string $day){
+        return match (strtolower($day)) {
+            'monday'    => Carbon::MONDAY,
+            'tuesday'   => Carbon::TUESDAY,
+            'wednesday' => Carbon::WEDNESDAY,
+            'thursday'  => Carbon::THURSDAY,
+            'friday'    => Carbon::FRIDAY,
+            'saturday'  => Carbon::SATURDAY,
+            'sunday'    => Carbon::SUNDAY,
+            default     => null,
+        };
     }
 
     public function externalIndividualEventStore(Request $request){
@@ -749,6 +946,38 @@ class LabBookingController extends Controller
         if($Booking->description == 'Holiday'){
             return redirect()->back()->with('error', 'Holidays cannot be completed. Please contact admin.');
         }
+        $isGotConfirmation = BookingConfirmationMail::where('booking_id',$request->booking_id)->first();
+        if($isGotConfirmation){
+            $isGotConfirmation->status = 'Completed';
+            $isGotConfirmation->save();
+
+            //Send Completion Email for Individuals
+            if($Booking->description == 'Exam' || $Booking->description == 'Practical'){
+                $completion = BookingCompletionMail::create([
+                    'email' => $isGotConfirmation->email,
+                    'booking_id' => $Booking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+                $thisBooking = LabBooking::with(['lab', 'computer'])->find($Booking->id);
+
+                dispatch(new SendBookingCompletionMail($thisBooking, $completion));
+            }
+            
+            else{
+                //Send Completion Email for Batches
+                $completion = BookingCompletionMail::create([
+                    'email' => $isGotConfirmation->email,
+                    'booking_id' => $Booking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+                $thisBooking = LabBooking::with(['lab'])->find($Booking->id);
+
+                dispatch(new SendLecturerBookingStatusMail($thisBooking, 'Completion', $completion->id));
+            }
+            
+        }
 
         $Booking->status = 'Completed';
         $Booking->color = '#28A745';
@@ -768,6 +997,38 @@ class LabBookingController extends Controller
             return redirect()->back()->with('error', 'Holidays cannot be cancelled. Please contact admin.');
         }
 
+        $isGotConfirmation = BookingConfirmationMail::where('booking_id',$request->booking_id)->first();
+        if($isGotConfirmation){
+            $isGotConfirmation->status = 'Cancelled';
+            $isGotConfirmation->save();
+
+            //Send Cancelation Email for Individuals
+            if($Booking->description == 'Exam' || $Booking->description == 'Practical'){
+                 $cancellation = BookingCancelationMail::create([
+                    'email' => $isGotConfirmation->email,
+                    'booking_id' => $Booking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+                $thisBooking = LabBooking::with(['lab', 'computer'])->find($Booking->id);
+
+                dispatch(new SendBookingCancelationMail($thisBooking, $cancellation));
+            }
+            
+            else{
+                //Send Cancelation Email for Batches
+                $cancellation = BookingCancelationMail::create([
+                    'email' => $isGotConfirmation->email,
+                    'booking_id' => $Booking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+                $thisBooking = LabBooking::with(['lab'])->find($Booking->id);
+
+                dispatch(new SendLecturerBookingStatusMail($thisBooking, 'Cancellation', $cancellation->id));
+            }
+        }
+
         $Booking->status = 'Cancelled';
         $Booking->color = '#E0A800';
         $Booking->save();
@@ -784,6 +1045,38 @@ class LabBookingController extends Controller
 
         if($Booking->description == 'Holiday'){
             return redirect()->back()->with('error', 'Holidays cannot be deleted. Please contact admin.');
+        }
+
+        $isGotConfirmation = BookingConfirmationMail::where('booking_id',$request->booking_id)->first();
+        if($isGotConfirmation){
+            $isGotConfirmation->status = 'Cancelled';
+            $isGotConfirmation->save();
+
+            //Send Cancelation Email for Individuals
+            if($Booking->description == 'Exam' || $Booking->description == 'Practical'){
+                 $cancellation = BookingCancelationMail::create([
+                    'email' => $isGotConfirmation->email,
+                    'booking_id' => $Booking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+                $thisBooking = LabBooking::with(['lab', 'computer'])->find($Booking->id);
+
+                dispatch(new SendBookingCancelationMail($thisBooking, $cancellation));
+            }
+            
+            else{
+                //Send Cancelation Email for Batches
+                $cancellation = BookingCancelationMail::create([
+                    'email' => $isGotConfirmation->email,
+                    'booking_id' => $Booking->id,
+                    'status' => 'Pending',
+                    'sent_at' => null,
+                ]);
+                $thisBooking = LabBooking::with(['lab'])->find($Booking->id);
+
+                dispatch(new SendLecturerBookingStatusMail($thisBooking, 'Cancellation', $cancellation->id));
+            }
         }
 
         $Booking->status = 'Deleted';
@@ -819,6 +1112,62 @@ class LabBookingController extends Controller
         });
 
         return response()->json($events);
+    }
+
+    public function getBookingTable(Request $request){
+        $range = $request->get('range', 'day');
+
+        $query = LabBooking::with(['lab', 'computer']);
+
+        if ($range === 'day') {
+            $query->whereDate('start', today());
+        }
+
+        if ($range === 'week') {
+            $query->whereBetween('start', [
+                now()->startOfWeek(),
+                now()->endOfWeek()
+            ]);
+        }
+
+        if ($range === 'month') {
+            $query->whereMonth('start', now()->month)
+                ->whereYear('start', now()->year);
+        }
+
+        $bookings = $query->orderBy('start')->get()->map(function ($booking) {
+
+            // ✅ Title logic
+            if ($booking->description === 'Holiday') {
+                // Keep title exactly as stored
+                $title = $booking->title;
+            } else {
+                // Existing logic
+                $title = str_contains($booking->description, 'Batch')
+                    ? $booking->batch
+                    : explode(' ', $booking->title)[0]; // student id only
+            }
+
+            return [
+                'id'       => $booking->id,
+                'type'     => $booking->description,
+                'title'    => $title,
+                'module'   => $booking->module,
+
+                'date'     => \Carbon\Carbon::parse($booking->start)->format('Y-m-d'),
+                'start'    => \Carbon\Carbon::parse($booking->start)->format('H:i'),
+                'end'      => \Carbon\Carbon::parse($booking->end)->format('H:i'),
+
+                'lab'      => $booking->lab->lab_name ?? 'N/A',
+                'computer' => optional($booking->computer)->computer_label ?? '—',
+                'status'   => $booking->status,
+
+                // keep full object for modal & color usage
+                'raw'      => $booking,
+            ];
+        });
+
+        return response()->json($bookings);
     }
 
     public function getModules($course_id){

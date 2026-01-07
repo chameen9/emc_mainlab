@@ -24,7 +24,7 @@ class BookingConfirmation extends Mailable
 
     public function build()
     {
-        Log::info('Building booking confirmation email for booking ID: ' . $this->booking->id);
+        //Log::info('Building booking confirmation email for booking ID: ' . $this->booking->id);
         return $this
             ->subject('Booking Confirmation')
             ->markdown('Mails.BookingConfirmation');

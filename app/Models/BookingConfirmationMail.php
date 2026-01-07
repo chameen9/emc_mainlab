@@ -18,4 +18,10 @@ class BookingConfirmationMail extends Model
     protected $primaryKey = 'id';
 
     protected $defaultTimestamps = false;
+
+    public function booking()
+    {
+        return $this->belongsTo(LabBooking::class, 'booking_id');
+    }
 }
+

@@ -43,3 +43,203 @@ body.show-spinner::after {
     -webkit-transform: rotate(360deg);
   }
 }
+
+
+/* ======================================================
+   FULLCALENDAR – COMPLETE DARK MODE OVERRIDES
+====================================================== */
+
+/* Base */
+body.dark-mode .fc {
+    background-color: #1b1e21 !important;
+    color: #e4e6eb !important;
+}
+
+/* Toolbar */
+body.dark-mode .fc-toolbar,
+body.dark-mode .fc-header-toolbar {
+    background-color: #1b1e21 !important;
+    border-bottom: 1px solid #2f3338;
+}
+
+body.dark-mode .fc-toolbar-title {
+    color: #ffffff !important;
+}
+
+/* Buttons */
+body.dark-mode .fc-button {
+    background-color: #2a2e33 !important;
+    border-color: #2a2e33 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .fc-button:hover,
+body.dark-mode .fc-button:focus {
+    background-color: #3a3f45 !important;
+}
+
+body.dark-mode .fc-button-primary:not(:disabled).fc-button-active,
+body.dark-mode .fc-button-primary:not(:disabled):active {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* Column headers (Mon, Tue…) */
+body.dark-mode .fc-col-header,
+body.dark-mode .fc-col-header-cell {
+    background-color: #212529 !important;
+}
+
+body.dark-mode .fc-col-header-cell-cushion {
+    color: #ffffff !important;
+}
+
+/* All-day row */
+body.dark-mode .fc-timegrid-allday,
+body.dark-mode .fc-daygrid-body,
+body.dark-mode .fc-daygrid-day-frame {
+    background-color: #1b1e21 !important;
+}
+
+/* Time axis (8am, 9am…) */
+body.dark-mode .fc-timegrid-axis,
+body.dark-mode .fc-timegrid-slot-label {
+    background-color: #212529 !important;
+    color: #e4e6eb !important;
+}
+
+/* Grid background */
+body.dark-mode .fc-scrollgrid,
+body.dark-mode .fc-scrollgrid-section,
+body.dark-mode .fc-scrollgrid-sync-table {
+    background-color: #1b1e21 !important;
+}
+
+/* Grid borders */
+body.dark-mode .fc-theme-standard td,
+body.dark-mode .fc-theme-standard th {
+    border-color: #2f3338 !important;
+}
+
+/* Time slots */
+body.dark-mode .fc-timegrid-slot {
+    background-color: #1b1e21 !important;
+}
+
+body.dark-mode .fc-timegrid-slot-lane {
+    background-color: #1b1e21 !important;
+}
+
+/* Horizontal lines */
+body.dark-mode .fc-timegrid-slot-minor {
+    border-top: 1px dotted #2f3338 !important;
+}
+
+/* Today highlight */
+body.dark-mode .fc-day-today {
+    background-color: rgba(13, 110, 253, 0.12) !important;
+}
+
+/* Event containers */
+body.dark-mode .fc-event,
+body.dark-mode .fc-daygrid-event,
+body.dark-mode .fc-timegrid-event {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Event text */
+body.dark-mode .fc-event-title,
+body.dark-mode .fc-event-time,
+body.dark-mode .fc-event-main {
+    color: #ffffff !important;
+}
+
+/* Event resize / mirror */
+body.dark-mode .fc-event-mirror {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Popovers */
+body.dark-mode .fc-popover {
+    background-color: #212529 !important;
+    border-color: #2f3338 !important;
+}
+
+body.dark-mode .fc-popover-header {
+    background-color: #2a2e33 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .fc-popover-body {
+    background-color: #1b1e21 !important;
+}
+
+/* Month view cells */
+body.dark-mode .fc-daygrid-day {
+    background-color: #1b1e21 !important;
+}
+
+body.dark-mode .fc-daygrid-day-number {
+    color: #e4e6eb !important;
+}
+
+/* Scrollbars */
+body.dark-mode .fc-scroller::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.dark-mode .fc-scroller::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 4px;
+}
+
+/* Now indicator */
+body.dark-mode .fc-timegrid-now-indicator-line {
+    border-color: #ff6b6b !important;
+}
+
+body.dark-mode .fc-timegrid-now-indicator-arrow {
+    border-color: #ff6b6b !important;
+}
+
+/* ======================================================
+   End - FULLCALENDAR – COMPLETE DARK MODE OVERRIDES
+====================================================== */
+
+
+/* ======================================================
+   DARK MODE – READONLY INPUT FIX
+====================================================== */
+
+body.dark-mode input[readonly],
+body.dark-mode textarea[readonly],
+body.dark-mode .form-control[readonly] {
+    background-color: #2a2e33 !important;
+    color: #e4e6eb !important;
+    border: 1px solid #3a3f45 !important;
+    opacity: 1 !important; /* remove Bootstrap dim effect */
+    cursor: not-allowed;
+}
+
+/* Placeholder text (just in case) */
+body.dark-mode input[readonly]::placeholder,
+body.dark-mode textarea[readonly]::placeholder {
+    color: #9aa0a6 !important;
+}
+
+/* Focus prevention styling */
+body.dark-mode input[readonly]:focus,
+body.dark-mode textarea[readonly]:focus {
+    box-shadow: none !important;
+    outline: none !important;
+    border-color: #3a3f45 !important;
+}
+
+/* Disabled select-like appearance consistency */
+body.dark-mode select[readonly],
+body.dark-mode select:disabled {
+    background-color: #2a2e33 !important;
+    color: #e4e6eb !important;
+    border-color: #3a3f45 !important;
+}

@@ -78,6 +78,9 @@
 
                 <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
                     href="{{ route('studentBooking') }}" >Visit Link</a>
+
+                <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
+                    href="#eventGuide" data-toggle="modal"><span class="simple-icon-info"></span></a>
             </div>
 
 
@@ -129,6 +132,7 @@
                     <div class="dropdown-menu dropdown-menu-right mt-3">
                         <a class="dropdown-item" href="#editProfile" data-toggle="modal">Profile</a>
                         <a class="dropdown-item" href="#changePassword" data-toggle="modal">Change Password</a>
+                        <a class="dropdown-item" href="{{route('userGuide')}}">User Guide</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="dropdown-item">Logout</button>
@@ -174,9 +178,9 @@
                                 <i class="simple-icon-event"></i> Holidays
                             </a>
                         </li>
-                        <li class="{{ trim($__env->yieldContent('nav')) === 'users' ? 'active' : '' }}">
-                            <a href="{{route('users')}}">
-                                <i class="simple-icon-user"></i> Users
+                        <li class="{{ trim($__env->yieldContent('nav')) === 'people' ? 'active' : '' }}">
+                            <a href="{{route('people')}}">
+                                <i class="simple-icon-user"></i> People
                             </a>
                         </li>
                     </ul>
@@ -214,384 +218,22 @@
         </footer>
 
         <!-- Change Password Modal -->
-        <div class="modal fade" id="changePassword" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Change Your Password</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="POST" action="{{ route('changePassword') }}">
-                        @csrf
-                        <div class="modal-body">
-                            
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <input type="hidden" class="form-control" id="name" name="name"
-                                            placeholder="Enter Name" value="{{ Auth::user()->name }}" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <input type="hidden" class="form-control" id="role" name="role"
-                                            placeholder="Enter Role" value="{{ ucfirst(Auth::user()->role) }}" readonly>
-                                    </div>
-                                </div>
-                                
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <input type="hidden" class="form-control" id="email" name="email"
-                                            placeholder="Enter Email" value="{{ Auth::user()->email }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="current_password">Current Password *</label>
-                                        <input type="password" class="form-control" id="current_password" name="current_password"
-                                            placeholder="Enter Current Password" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label for="password">New Password *</label>
-                                        <input type="password" class="form-control" id="password" name="password"
-                                            placeholder="Enter New Password" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label for="confirm_password">Confirm Password *</label>
-                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password"
-                                            placeholder="Enter Confirm Password" required>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary"
-                                data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Update</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        @include('Partials.Profile.changePassword')
 
         <!-- Edit Profile Modal -->
-        <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Your Profile</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="POST" action="{{ route('editProfile') }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-body">
-                            
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label for="name">Name *</label>
-                                        <input type="text" class="form-control" id="name" name="name"
-                                            placeholder="Enter Name" value="{{ Auth::user()->name }}" required>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label for="role">Role</label>
-                                        <input type="text" class="form-control" id="role" name="role"
-                                            placeholder="Enter Role" value="{{ ucfirst(Auth::user()->role) }}" readonly>
-                                    </div>
-                                </div>
-                                
-                            </div>
+        @include('Partials.Profile.editProfile')
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="email">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email"
-                                            placeholder="Enter Email" value="{{ Auth::user()->email }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
+        <!-- Event Guide Modal -->
+        @include('Partials.Calendar.eventGuideModal')
 
-                            <div class="select-from-library-container mb-1">
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-6 col-xl-12">
+        <!-- Success Notification -->
+        @include('Partials.Global.successNotification')
 
-                                        <!-- Clickable upload area -->
-                                        <div class="select-from-library-button sfl-single mb-5"
-                                            id="imagePicker">
-                                            <div class="card d-flex flex-row mb-4 media-thumb-container justify-content-center align-items-center">
-                                                Click to change profile picture
-                                            </div>
-                                        </div>
+        <!-- Error Notification -->
+        @include('Partials.Global.errorNotification')
 
-                                        <!-- Hidden file input -->
-                                        <input type="file"
-                                            id="imageInput"
-                                            name="image"
-                                            accept="image/*"
-                                            hidden>
-
-                                        <!-- Preview -->
-                                        <div class="selected-library-item sfl-selected-item mb-5 d-none"
-                                            id="imagePreviewWrapper" style="display: block;">
-                                            <div class="card d-flex flex-row media-thumb-container">
-                                                <a class="d-flex align-self-center">
-                                                    <img src=""
-                                                        alt="uploaded image"
-                                                        class="list-media-thumbnail responsive border-0"
-                                                        id="imagePreview"
-                                                        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" />
-                                                </a>
-
-                                                <div class="d-flex flex-grow-1 min-width-zero">
-                                                    <div class="card-body align-self-center">
-                                                        <p class="list-item-heading mb-1 truncate"
-                                                        id="imageName"></p>
-                                                    </div>
-
-                                                    <div class="pl-1 align-self-center">
-                                                        <a href="#"
-                                                        class="btn-link"
-                                                        id="removeImage">
-                                                            <i class="simple-icon-trash"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary"
-                                data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Update</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Image Upload Preview Script -->
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-
-                const imagePicker = document.getElementById('imagePicker');
-                const imageInput = document.getElementById('imageInput');
-                const imagePreviewWrapper = document.getElementById('imagePreviewWrapper');
-                const imagePreview = document.getElementById('imagePreview');
-                const imageName = document.getElementById('imageName');
-                const removeImage = document.getElementById('removeImage');
-
-                // Click card → open file chooser
-                imagePicker.addEventListener('click', function () {
-                    imageInput.click();
-                });
-
-                // File selected → show preview
-                imageInput.addEventListener('change', function () {
-                    const file = this.files[0];
-
-                    if (!file) return;
-
-                    // DEBUG (remove later)
-                    console.log('Selected file:', file);
-
-                    if (!file.type.startsWith('image/')) {
-                        alert('Please select an image file');
-                        return;
-                    }
-
-                    const reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imageName.textContent = file.name;
-                        imagePreviewWrapper.classList.remove('d-none');
-                    };
-
-                    reader.readAsDataURL(file);
-                });
-
-                // Remove image
-                removeImage.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    imageInput.value = '';
-                    imagePreview.src = '';
-                    imageName.textContent = '';
-                    imagePreviewWrapper.classList.add('d-none');
-                });
-
-            });
-        </script>
-
-        <!-- @if ($message = Session::get('success'))
-             <<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: "{!! $message !!}",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        // toast: true,
-                    });
-                });
-            </script>
-            <a href="#" class="btn btn-outline-primary rounded notify-btn mb-1" data-from="top"
-                data-align="left">Top Left</a>
-
-            <div class="alert alert-success alert-dismissible fade show rounded mb-0" role="alert">
-                <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif -->
-
-        @if ($message = Session::get('success'))
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                $.notify(
-                    {
-                        message: "{{ $message }}"
-                    },
-                    {
-                        type: "success",
-                        allow_dismiss: true,
-                        newest_on_top: true,
-                        placement: {
-                            from: "top",
-                            align: "right"
-                        },
-                        delay: 3000,
-                        animate: {
-                            enter: "animated fadeInDown",
-                            exit: "animated fadeOutUp"
-                        }
-                    }
-                );
-            });
-        </script>
-        @endif
-
-        <!-- @if ($message = Session::get('error'))
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: "{!! $message !!}",
-                        showConfirmButton: false,
-                        timer: 6000,
-                        // toast: true,
-                    });
-                });
-            </script>
-        @endif  -->
-
-        @if ($message = Session::get('error'))
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                $.notify(
-                    {
-                        message: "{{ $message }}"
-                    },
-                    {
-                        type: "danger",
-                        allow_dismiss: true,
-                        newest_on_top: true,
-                        placement: {
-                            from: "top",
-                            align: "right"
-                        },
-                        delay: 4000,
-                        animate: {
-                            enter: "animated fadeInDown",
-                            exit: "animated fadeOutUp"
-                        }
-                    }
-                );
-            });
-        </script>
-        @endif
-
-        <!-- @if (count($errors)>0)
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    let errorMessages = `{!! implode('<br>', $errors->all()) !!}`;
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error!',
-                        html: errorMessages, // Use HTML to display multiple errors
-                        //timer: 5000, // Auto-close after 5 seconds
-                        showConfirmButton: true,
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                        // toast: true,
-                        // position: 'top-end'
-                    });
-                });
-            </script>
-        @endif -->
-
-        @if (count($errors)>0)
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-
-                let errorMessages = `{!! implode('<br>', $errors->all()) !!}`;
-
-                $.notify(
-                    {
-                        message: errorMessages
-                    },
-                    {
-                        type: "warning",
-                        allow_dismiss: true,
-                        newest_on_top: true,
-                        timer: 5000,
-                        placement: {
-                            from: "top",
-                            align: "right"
-                        }
-                    }
-                );
-
-            });
-        </script>
-        @endif
+        <!-- Validation Errors Notification -->
+        @include('Partials.Global.validationErrorsNotification')
 
         <script src="js/vendor/jquery-3.3.1.min.js"></script>
         <script src="js/vendor/bootstrap.bundle.min.js"></script>
@@ -610,6 +252,30 @@
         <script src="js/dore.script.js"></script>
         <script src="js/scripts.js"></script>
         <script src="js/vendor/bootstrap-notify.min.js"></script>
+
+        <!-- Calendar Dark Mode Toggle Script -->
+        <script>
+            $(document).ready(function () {
+                const switchDark = $('#switchDark');
+
+                function applyDarkMode(isDark) {
+                    if (isDark) {
+                        $('body').addClass('dark-mode');
+                    } else {
+                        $('body').removeClass('dark-mode');
+                    }
+                }
+
+                // Initial state
+                applyDarkMode(switchDark.is(':checked'));
+
+                // On toggle
+                switchDark.on('change', function () {
+                    applyDarkMode(this.checked);
+                });
+            });
+        </script>
+
     </body>
 
 </html>

@@ -11,6 +11,7 @@ use App\Mail\BookingConfirmation;
 use App\Models\LabBooking;
 use Illuminate\Support\Facades\Log;
 use App\Models\BookingConfirmationMail;
+use Carbon\Carbon;
 
 class SendBookingConfirmationMail implements ShouldQueue
 {
@@ -30,11 +31,11 @@ class SendBookingConfirmationMail implements ShouldQueue
         Mail::to($this->confirmation->email)
             ->send(new BookingConfirmation($this->booking));
 
-        Log::info('Booking confirmation email sent to: ' . $this->confirmation->email);
+        //Log::info('Booking confirmation email sent to: ' . $this->confirmation->email);
 
         $this->confirmation->update([
             'status' => 'Sent',
-            'sent_at' => now(),
+            'sent_at' => Carbon::now('Asia/Colombo'),
         ]);
     }
 }

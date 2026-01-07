@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Lecturer;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\UserCredentials;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
-    public function addUser(Request $request)
-    {
+    public function addUser(Request $request){
         // Validate the request data
         $request->validate([
             'name' => 'required|string|max:255',
@@ -36,8 +37,7 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'User created successfully!');
     }
 
-    public function editProfile(Request $request)
-    {
+    public function editProfile(Request $request){
         $user = auth()->user();
 
         //dd($request->all());
@@ -75,5 +75,50 @@ class UserController extends Controller
 
         // Redirect back with success message
         return redirect()->back()->with('success', 'Profile updated successfully!');
+    }
+
+    public function addLecturer(Request $request){
+        // Validate the request data
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:lecturers',
+        ]);
+
+        // Create a new lecturer
+        $lecturer = Lecturer::create([
+            'title' => $request->title,
+            'name' => $request->name,
+            'email' => $request->email,
+            'status' => 'Active',
+            'created_at' => Carbon::now('Asia/Colombo'),
+            'updated_at' => Carbon::now('Asia/Colombo'),
+        ]);
+        
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Lecturer created successfully!');
+    }
+
+    public function updateLecturer(Request $request){
+        // Validate the request data
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'status' => 'required|string',
+        ]);
+
+        // Create a new lecturer
+        $lecturer = Lecturer::find($request->input('lecturer_id'));
+
+        $lecturer->title = $request->input('title');
+        $lecturer->name = $request->input('name');
+        $lecturer->email = $request->input('email');
+        $lecturer->status = $request->input('status');
+        $lecturer->updated_at = Carbon::now('Asia/Colombo');
+        $lecturer->save();
+        
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Lecturer updated successfully!');
     }
 }

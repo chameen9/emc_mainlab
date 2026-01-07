@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('Layouts.master')
 
 @section('title', 'Computers')
 @section('nav', 'computers')
