@@ -6,7 +6,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="row">
-            <div class="col-6">
+            <div class="col-lg-6 col-md-12 mb-4">
                 <div class="mb-2">
                     <h1>Users</h1>
                     <div class="top-right-button-container">
@@ -66,7 +66,7 @@
 
             </div>
 
-            <div class="col-6">
+            <div class="col-lg-6 col-md-12 mb-4">
                 <div class="mb-2">
                     <h1>Lecturers</h1>
                     <div class="top-right-button-container">
