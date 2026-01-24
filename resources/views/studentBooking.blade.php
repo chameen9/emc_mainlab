@@ -316,7 +316,7 @@
                                         <div class="form-group">
                                             <label class="form-group has-float-label mb-4">
                                             <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email" required>
-                                            <span>Email *</span>
+                                            <span>Email</span>
                                             </label>
                                         </div>
                                     </div>

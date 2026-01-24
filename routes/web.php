@@ -12,6 +12,9 @@ Route::post('/logout', 'App\Http\Controllers\AuthController@logout')->name('logo
 
 Route::get('/reserve','App\Http\Controllers\LabBookingController@studentBooking')->name('studentBooking');
 Route::post('/externalindividual-event-store', 'App\Http\Controllers\LabBookingController@externalIndividualEventStore')->name('externalIndividualEventStore');
+Route::get('/userguide', function () {
+    return view('Docs.externalUserGuide');
+})->name('externalUserGuide');
 
 Route::middleware(['auth', 'role:invigilator,admin'])->group(function () {
 
