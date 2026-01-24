@@ -22,7 +22,7 @@ This email confirms that your reservation at **EMC Main Lab** has been **success
 **💻 Computer:** {{ $booking->computer->computer_label ?? 'N/A' }}
 @endcomponent
 
-@component('mail::button', ['url' => 'https://emcgalle.payzlite.net/reserve'])
+@component('mail::button', ['url' => 'https://www.emcgalle.online/reserve'])
 Reserve Another Slot
 @endcomponent
 

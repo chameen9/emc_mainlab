@@ -79,8 +79,10 @@
                 <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
                     href="{{ route('studentBooking') }}" >Visit Link</a>
 
-                <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
-                    href="#eventGuide" data-toggle="modal"><span class="simple-icon-info"></span></a>
+                @if(trim($__env->yieldContent('nav')) === 'calendar')
+                    <a class="btn btn-sm btn-outline-primary ml-3 d-none d-md-inline-block"
+                        href="#eventGuide" data-toggle="modal"><span class="simple-icon-info"></span></a>
+                @endif
             </div>
 
 

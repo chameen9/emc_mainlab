@@ -23,7 +23,7 @@ Below are the details of your booking at **EMC Main Lab**.
 **💻 Computer:** {{ $booking->computer->computer_label }}
 @endcomponent
 
-@component('mail::button', ['url' => 'https://emcgalle.payzlite.net/reserve'])
+@component('mail::button', ['url' => 'https://www.emcgalle.online/reserve'])
 Reserve Another Slot
 @endcomponent
 

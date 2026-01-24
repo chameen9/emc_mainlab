@@ -23,7 +23,7 @@ Please do not attend the lab for this booking.
 **💻 Computer:** {{ $booking->computer->computer_label ?? 'N/A' }}
 @endcomponent
 
-@component('mail::button', ['url' => 'https://emcgalle.payzlite.net/reserve'])
+@component('mail::button', ['url' => 'https://www.emcgalle.online/reserve'])
 Make a New Reservation
 @endcomponent
 

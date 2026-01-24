@@ -12,7 +12,7 @@ Here are your account credentials for **EMC Main Lab**:
 
 ---
 
-@component('mail::button', ['url' => 'https://emcgalle.payzlite.net/login'])
+@component('mail::button', ['url' => 'https://www.emcgalle.online/login'])
 Visit EMC Main Lab !
 @endcomponent
 
