@@ -362,8 +362,14 @@ class LabBookingController extends Controller
             'start' => 'required',
             'end' => 'required',
         ]);
-        if($request->input('date') < Carbon::now('Asia/Colombo')->format('m/d/Y')){
-            return redirect()->back()->with('error', 'Time travel is not supported yet! Please select a valid date.');
+        $selectedDate = Carbon::parse($request->input('date'), 'Asia/Colombo');
+        $today = Carbon::now('Asia/Colombo')->startOfDay();
+
+        if ($selectedDate->lt($today)) {
+            return redirect()->back()->with(
+                'error',
+                'Time travel is not supported yet! Please select a valid date.'
+            );
         }
 
         if($request->input('start') == $request->input('end')){
@@ -474,8 +480,14 @@ class LabBookingController extends Controller
             'start' => 'required',
             'end' => 'required',
         ]);
-        if($request->input('date') < Carbon::now('Asia/Colombo')->format('m/d/Y')){
-            return redirect()->back()->with('error', 'Time travel is not supported yet! Please select a valid date.');
+        $selectedDate = Carbon::parse($request->input('date'), 'Asia/Colombo');
+        $today = Carbon::now('Asia/Colombo')->startOfDay();
+
+        if ($selectedDate->lt($today)) {
+            return redirect()->back()->with(
+                'error',
+                'Time travel is not supported yet! Please select a valid date.'
+            );
         }
 
         if($request->input('start') == $request->input('end')){
@@ -626,6 +638,16 @@ class LabBookingController extends Controller
             'batch_id'    => 'required|exists:batches,id',
             'computer_id' => 'required|exists:computers,id',
         ]);
+
+        $selectedDate = Carbon::parse($request->input('day'), 'Asia/Colombo');
+        $today = Carbon::now('Asia/Colombo')->startOfDay();
+
+        if ($selectedDate->lt($today)) {
+            return redirect()->back()->with(
+                'error',
+                'Time travel is not supported yet! Please select a valid date.'
+            );
+        }
 
         if ($request->start >= $request->end) {
             return back()->with('error', 'End time must be after start time.');
